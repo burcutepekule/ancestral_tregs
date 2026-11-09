@@ -31,7 +31,7 @@ the data behind every figure, and one script per figure.
 Run them from the repository root.
 
 ```sh
-Rscript setup_data.R       # 1. unpack the data: CSV -> the .rds files R reads   (about 4 min)
+Rscript setup_data.R       # 1. unpack the data: CSV -> the .rds files R reads   (about 2 min)
 bash make_figures.sh       # 2. render every figure of the paper                 (about 9 min on 6 cores)
 open figures/              # 3. look at them (macOS; any file browser will do)
 ```

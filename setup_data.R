@@ -4,7 +4,7 @@
 ## The data are shipped as CSV (data/*.csv, data/*.csv.gz). The R scripts read
 ## binary .rds files. This script builds one data/<name>.rds from the CSV file(s)
 ## of each table, with every number restored bit-for-bit (lib/data_io.R explains
-## how). Nothing is computed; it takes about three minutes.
+## how). Nothing is computed; it takes about two minutes.
 ##
 ## The .rds files are a local cache and are not under git (.gitignore). A file
 ## that already exists is left alone, so a table you regenerated with a pipeline

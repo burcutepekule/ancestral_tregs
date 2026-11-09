@@ -2,8 +2,8 @@
 ## ============================================================================
 ## make_figures.sh -- STEP 2: render every computed figure of the paper.
 ##
-##   Rscript setup_data.R       # step 1, once: CSV -> .rds  (about 3 min)
-##   bash make_figures.sh       # step 2: all figures        (about 15 min the first time)
+##   Rscript setup_data.R       # step 1, once: CSV -> .rds  (about 2 min)
+##   bash make_figures.sh       # step 2: all figures        (about 9 min the first time, 3 min after)
 ##   FIGS="Fig_4 Extended_Data_Fig_5" bash make_figures.sh   # some of them
 ##
 ## Two inputs are time courses that are cheap to compute and large to store, so
