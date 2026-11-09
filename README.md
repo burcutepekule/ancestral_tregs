@@ -263,8 +263,10 @@ These checks were run on the repository as it is here, starting from the CSV fil
 - **The figures come out.** `setup_data.R` then `make_figures.sh` renders all 14 computed
   figures. Five are identical, pixel for pixel, to the images in the manuscript (Figs. 2
   and 5, Extended Data Figs. 5 and 6, Supplementary Fig. 3). The other nine show the same
-  content and differ from the manuscript images only by shifts of one or two pixels in
-  the placement of lines and text. All 14 are identical, pixel for pixel, to what the
+  data and differ from the manuscript images only in placement, by at most five pixels:
+  after letting each small block of the image slide into alignment, nothing is left over
+  except sub-pixel differences in text labels with subscripts. The same test flags a
+  figure drawn from data changed by 1%. All 14 are identical, pixel for pixel, to what the
   authors' working scripts produce from the original data files.
 - **The numbers come out.** The tables that the scripts write to `source_data/` (the
   counts and statistics behind Fig. 2, the load-balance figures, Supplementary Figs. 1
