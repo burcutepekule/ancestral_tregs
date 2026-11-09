@@ -1,0 +1,1001 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,longtable,array,tabularx}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage[strings]{underscore}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\sloppy
+\setlength{\parskip}{0.45em}
+\setlength{\parindent}{0pt}
+\setcounter{tocdepth}{1}
+\renewcommand{\arraystretch}{1.08}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcommand{\bros}{\beta_r}
+\newcommand{\gap}{\Delta E_h(0)^{*}}
+
+\usepackage{xr}
+\externaldocument[F-]{figure_methods}
+\newcommand{\compname}{figure methods}
+\title{Methods}
+\author{}
+\date{}
+\begin{document}
+\maketitle
+\tableofcontents
+
+\section*{Conventions}
+\addcontentsline{toc}{section}{Conventions}
+
+
+\emph{Companion document.} How each figure of the dossier was generated -- its
+population, selection, solver settings, plotted quantities and the numbers in its
+caption -- is described in \texttt{figure\_methods.pdf}, one section per figure,
+titled by the index the figure carries in the manuscript, the Extended Data or the
+Supplementary Information. Section, table and equation numbers given below as ``of
+the figure methods'' are numbers in that document.
+
+\emph{Conventions.} \emph{Tregs OFF} and \emph{Tregs ON} denote the two Treg
+conditions of one parameter combination (Section~\ref{sec:model}); in Fig.~2
+alone, ON and OFF refer to efferocytosis intact and knocked out. An \emph{initial
+condition} is a state at $t = 0$; a \emph{final state} is the state at the end of an
+integration (not a time average, unless a tail mean is stated). All
+model quantities are dimensionless state units (Section~\ref{sec:units}); time is in model
+time units. Large integers carry thousands separators; percentages are of the
+population named in the same sentence. Classes of parameter combinations are
+written \emph{bistable}, \emph{ON\_mono}, \emph{mono\_A} and
+\emph{unresolved\_on}; branches are \emph{sterile}, \emph{pathogenic help} and
+\emph{pathogenic harm} (Section~\ref{sec:classes}). Scripts are named relative to
+the repository root.
+\section{Model}
+\label{sec:model}
+
+%% ===========================================================================
+%% core.tex -- the model, the parameter sweep, the gate, and Figure 3 with Supplementary
+%% Figures S01, S06.
+%% Body text only (no preamble). Requires amsmath, booktabs.
+%% Every number below was recomputed on 2026-10-01 from the data files by
+%%   FP_DIR=<folder holding fp_big_batch_*.rds> Rscript pipeline/census_core.R
+%% ("census" below; the tag in square brackets is the section of its output), or by
+%% the figure scripts named in place. Code references are to the repository.
+%% ===========================================================================
+
+%% ---- from docs/methods_parts/core.tex, lines 15-80
+\subsection{State variables}
+
+The model is a system of 13 ordinary differential equations for two compartments,
+the gut lumen and the lamina propria (LP), separated by the epithelium. The states
+are: luminal pathogens $P_L$; LP pathogens $P_{LP}$ and LP commensals $C_{LP}$;
+healthy, apoptotic and necrotic epithelial cells $E_h$, $E_a$, $E_n$; resting and
+activated (M1) macrophages $M_0$, $M_1$; reactive oxygen species $R$; resting and
+active regulatory T cells $T_0$, $T_r$; a danger signal $D$; and a suppressive
+signal $S$. Luminal commensals are a fixed reservoir, $C_L = 1000$, not a state.
+Macrophages and Tregs are conserved pools: $dM_0/dt = -dM_1/dt$ and
+$dT_0/dt = -dT_r/dt$, so that $M_0 + M_1 = K_M$ and $T_0 + T_r = K_T$ for all $t$.
+
+\subsection{Equations}
+
+With $\theta \in \{0,1\}$ switching Treg induction off or on
+(\texttt{rhs\_app} in \texttt{pipeline/01\_sweep.R} and \texttt{lib/skeleton\_defs.R};
+the two are the same function, apart from the knockout factor of
+Section~\ref{sec:model-mods}, which equals 1 everywhere but in Fig.~2),
+\begin{align}
+\frac{dP_L}{dt} &= r_P\,P_L\Big(1-\frac{P_L}{K_{L,P}}\Big) - \alpha_{\mathrm{AMP}}\,D\,P_L,\\
+\frac{dP_{LP}}{dt} &= \gamma_{B,P}\,P_L\Big(1-\frac{E_h}{K_E}\Big)\Big(1-\frac{P_{LP}}{K_{LP,P}}\Big)
+  + r_P\,P_{LP}\Big(1-\frac{P_{LP}}{K_{LP,P}}\Big)\nonumber\\
+  &\qquad - P_{LP}\big(\alpha_0 M_0 + \alpha_{1,e} M_1 + \alpha_{1,r} R\big),\\
+\frac{dC_{LP}}{dt} &= \gamma_{B,C}\,C_L\Big(1-\frac{E_h}{K_E}\Big)\Big(1-\frac{C_{LP}}{K_{LP,C}}\Big)
+  - C_{LP}\big(\alpha_0 M_0 + \alpha_{1,e} M_1 + \alpha_{1,r} R\big),\\
+\frac{dE_h}{dt} &= \kappa_E\,(K_E - E_h) - E_h\Big(\tau_r R + \tau_{P,B}\,\frac{P_{LP}}{K_{LP,P}}\Big),\\
+\frac{dE_a}{dt} &= \tau_r\,R\,E_h - \mu_{E_a} E_a - g(L)\,(M_0+M_1)\,E_a,\\
+\frac{dE_n}{dt} &= \tau_{P,B}\,\frac{P_{LP}}{K_{LP,P}}\,E_h + \mu_{E_a} E_a - g(L)\,(M_0+M_1)\,E_n,\\
+\frac{dM_0}{dt} &= -\tau_{01}\,D\,M_0 + \tau_{10}\,S\,M_1 + \tau_{1,d}\,M_1 + \tau_{\mathrm{eff}}\,g(L)\,E_a M_1,\\
+\frac{dM_1}{dt} &= \tau_{01}\,D\,M_0 - \tau_{10}\,S\,M_1 - \tau_{1,d}\,M_1 - \tau_{\mathrm{eff}}\,g(L)\,E_a M_1,\\
+\frac{dR}{dt} &= \beta_r\,M_1 - \mu_R\,R,\\
+\frac{dT_0}{dt} &= -\theta\,\tau_{t,a}\,M_1\,C_{\mathrm{rat}}\,T_0 + \tau_{t,d}\,T_r,\\
+\frac{dT_r}{dt} &= \theta\,\tau_{t,a}\,M_1\,C_{\mathrm{rat}}\,T_0 - \tau_{t,d}\,T_r,\\
+\frac{dD}{dt} &= \sigma_D\big(w\,f_{E_n} + (1-w)\,f_{PC}\big) - \tau_D\,D,\\
+\frac{dS}{dt} &= \sigma_S\,T_r - \tau_S\,S,
+\label{eq:model-last}
+\end{align}
+with
+\begin{gather}
+L = E_a + E_n,\qquad
+g(L) = a_{\mathrm{floor}} + (a_0 - a_{\mathrm{floor}})\,\frac{K_g^{\,n_g}}{K_g^{\,n_g} + L^{n_g}},
+\label{eq:g}\\
+f_P = \frac{P_{LP}}{K_{LP,P}},\qquad f_C = \frac{C_{LP}}{K_{LP,C}},\qquad
+C_{\mathrm{rat}} = \begin{cases} f_C/(f_P+f_C), & f_P + f_C > 0,\\ 0, & \text{otherwise},\end{cases}\nonumber\\
+f_{PC} = \frac{P_{LP} + C_{LP}}{K_{LP,P} + K_{LP,C}},\qquad
+f_{E_n} = \frac{E_n}{K_{E_n} + E_n},\nonumber\\
+K_{E_n} = \frac{K_E\,\tau_{P,B} + \mu_{E_a} K_{E_a}}{a_0 K_M},\qquad
+K_{E_a} = \frac{K_E\,\tau_r\,K_R}{\mu_{E_a} + a_0 K_M}.
+\label{eq:KEaKEn}
+\end{gather}
+A single pathogen growth rate $r_P$ applies in the lumen and in the LP (code
+parameters \texttt{r\_L\_P} and \texttt{r\_LP\_P}, set equal in every call).
+Efferocytic clearance is the decreasing Hill function $g(L)$ of the dead-cell load:
+close to $a_0$ for $L \ll K_g$, equal to $(a_0 + a_{\mathrm{floor}})/2$ at $L = K_g$, and
+approaching $a_{\mathrm{floor}}$ for $L \gg K_g$. The same factor multiplies the
+efferocytosis-driven reversion of M1 macrophages, $\tau_{\mathrm{eff}}\,g(L)\,E_a M_1$.
+$K_{E_a}$ and $K_{E_n}$ are normalizing constants built from the intact $a_0$.
+The right-hand side is evaluated at the componentwise positive part of the state,
+$\max(y, 0)$; for trajectories in the non-negative orthant this changes nothing, and
+it prevents integration round-off below the invariant manifold $P_{LP} = 0$ from
+engaging the logistic term, which is negative and quadratic for $P_{LP} < 0$.
+
+\subsection{Treg conditions}
+\label{sec:treg-conditions}
+
+\emph{Tregs OFF} is $\theta = 0$: $T_r$ and $S$ start at zero and stay there, so
+every Treg term vanishes. \emph{Tregs ON} is $\theta = 1$. Nothing
+else differs between the two conditions of a parameter combination. Tregs are
+the \emph{baseline} Treg, fully stable ($\phi = 0$) and fully specific ($\eta = 1$),
+in every analysis except that of Fig.~5 and Extended Data Figs.~6 and~7
+(Section~\ref{F-sec:fig7} of the figure methods): induction reads the true commensal fraction $C_{\mathrm{rat}}$
+and reversion occurs at rate $\tau_{t,d}$. The two stability and specificity parameters stored in the parameter grids
+(\texttt{phi\_instability}, \texttt{treg\_eff}) are 0 in every row and are removed
+before the sweep's right-hand side is built, which contains neither; the fixed-point
+finder uses the general right-hand side of \texttt{lib/ODE\_SYSTEM\_v6.R} with
+$\phi = 0$ and $\eta = 1$ fixed, which is the same function.
+%% from: census [grid]
+
+%% ---- from docs/methods_parts/core.tex, lines 82-105
+\subsection{Fixed constants}
+
+\begin{table}[H]
+\centering
+\caption{Fixed constants (\texttt{STRUCTURAL} and \texttt{EFFERO} in
+\texttt{pipeline/01\_sweep.R}). Bacterial quantities are in state units of
+$10^{11}$ organisms.}
+\label{tab:core-const}
+\begin{tabular}{lll}
+\toprule
+Symbol & Value & Meaning\\\midrule
+$K_E$ & 100 & epithelial capacity (cells, arbitrary unit)\\
+$K_M$, $K_T$ & 100, 100 & macrophage and Treg pool sizes\\
+$K_R$ & 1 & ROS scale (enters $K_{E_a}$ only)\\
+$K_{L,P}$ & 1000 ($10^{14}$ organisms) & luminal pathogen carrying capacity\\
+$K_{LP,P}$ & 100 ($10^{13}$ organisms) & LP pathogen carrying capacity\\
+$K_{LP,C}$ & 100 ($10^{13}$ organisms) & LP commensal normalizing capacity\\
+$C_L$ & 1000 ($10^{14}$ organisms) & luminal commensal reservoir\\
+$a_0$ & $4.5\times10^{-3}$ & maximal efferocytosis rate per macrophage\\
+$a_{\mathrm{floor}}$ & $2\times10^{-4}$ & efferocytosis rate at saturating load\\
+$n_g$ & 4 & Hill exponent of $g$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Sampled kinetic parameters}
+\label{sec:kin-table}
+
+Table~\ref{tab:core-kin} lists the 22 kinetic parameters that are sampled (Section~\ref{sec:sampling}), with their symbols in the equations above and their names in the code. Three further parameters, $K_g$, $\bros$ and $r_P$, are set on grids (Section~\ref{sec:axes}).
+
+%% ---- from docs/methods_parts/core.tex, lines 139-170
+\begin{table}[H]
+\centering
+\caption{Sampled kinetic parameters (rates per unit time; $w$ dimensionless), their names in the code (\texttt{lib/ODE\_SYSTEM\_v6.R}, \texttt{lib/skeleton\_defs.R}), ranges and sampling scale.}
+\label{tab:core-kin}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lllll}
+\toprule
+Parameter & Code & Range & Scale & Role\\\midrule
+$\kappa_E$ & \texttt{kappa\_E} & 0.05--0.15 & log & epithelial regeneration\\
+$\tau_r$ & \texttt{tau\_r} & 0.05--0.50 & log & epithelial damage by ROS\\
+$\tau_{P,B}$ & \texttt{tau\_P\_B} & 0.05--0.50 & log & epithelial damage by LP pathogens (necrosis)\\
+$\mu_{E_a}$ & \texttt{mu\_Ea} & 0.05--0.95 & log & secondary necrosis of apoptotic cells\\
+$\mu_R$ & \texttt{mu\_R} & 0.05--0.50 & log & ROS decay\\
+$\tau_{01}$ & \texttt{tau\_01} & 0.005--0.95 & log & $D$-driven M1 activation\\
+$\tau_{10}$ & \texttt{tau\_10} & 0.005--0.95 & log & $S$-driven M1 deactivation\\
+$\tau_{1,d}$ & \texttt{tau\_1\_d} & 0.005--0.95 & log & spontaneous M1 deactivation\\
+$\tau_{\mathrm{eff}}$ & \texttt{tau\_eff} & 0.5--95 & log & efferocytosis-driven M1 deactivation\\
+$\tau_{t,a}$ & \texttt{tau\_t\_a} & $5\times10^{-5}$--$9.5\times10^{-3}$ & log & Treg induction\\
+$\tau_{t,d}$ & \texttt{tau\_t\_d} & 0.005--0.95 & log & Treg reversion\\
+$\alpha_0$ & \texttt{alpha\_0} & $5\times10^{-5}$--$10^{-4}$ & log & microbial clearance by $M_0$\\
+$\alpha_{1,e}$ & \texttt{alpha\_1\_e} & $10^{-4}$--$5\times10^{-4}$ & log & microbial engulfment by $M_1$\\
+$\alpha_{1,r}$ & \texttt{alpha\_1\_r} & 0.05--0.95 & log & ROS-mediated microbial clearance\\
+$\alpha_{\mathrm{AMP}}$ & \texttt{alpha\_AMP} & 0.01--0.10 & log & AMP killing of luminal pathogens\\
+$\gamma_{B,P}$ & \texttt{gamma\_B\_P} & 0.001--0.10 & log & pathogen translocation\\
+$\gamma_{B,C}$ & \texttt{gamma\_B\_C} & 0.001--0.10 & log & commensal translocation\\
+$\sigma_D$ & \texttt{sigma\_D} & 0.05--0.95 & log & danger-signal production\\
+$\sigma_S$ & \texttt{sigma\_S} & $5\times10^{-4}$--$9.5\times10^{-3}$ & log & suppressive-signal production\\
+$\tau_D$ & \texttt{tau\_D} & 0.001--0.50 & log & danger-signal decay\\
+$\tau_S$ & \texttt{tau\_S} & 0.001--0.50 & log & suppressive-signal decay\\
+$w$ & \texttt{w\_E\_over\_M} & 0.05--0.95 & linear & weight of $f_{E_n}$ against $f_{PC}$ in $dD/dt$\\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+%% ---- from docs/methods_parts/core.tex, lines 107-119
+\subsection{Units and the pathogen extinction floor}
+\label{sec:units}
+
+One state unit of bacteria is
+$10^{11}$ organisms in every compartment, so one organism is $10^{-11}$ units, and a
+compartment holding less than one organism holds none. Every integration therefore
+carries a root on $\max(P_L, P_{LP}) - 10^{-11}$ (\texttt{EXT\_TOL}); when it is
+reached, an event sets both $P_L$ and $P_{LP}$ to exactly zero
+(\texttt{lib/extinction\_floor.R}, sourced by the sweep and by every figure script).
+Every term of $dP_L/dt$ carries a factor $P_L$, and every term of $dP_{LP}/dt$ a factor
+$P_L$ or $P_{LP}$, so both remain zero afterwards. The root is on the larger of the two
+compartments because zeroing $P_{LP}$ alone while $P_L$ is above the floor leaves the
+translocation influx positive. $C_{LP}$ is not floored: its influx is proportional to
+the fixed reservoir $C_L$. Without the floor, a pathogen driven to $10^{-100}$ can
+regrow once $M_1$ is suppressed, and the outcome is then decided by the sign of
+round-off error.
+
+\subsection{The total burden}
+\label{sec:burden}
+
+Outcomes are ordered throughout by the total burden of a state,
+\begin{equation}
+b(E_h, P_{LP}) = \sqrt{(K_E - E_h)^2 + P_{LP}^2},
+\label{eq:burden}
+\end{equation}
+the Euclidean distance in the $(E_h, P_{LP})$ plane from the healthy, pathogen-free
+state $(K_E, 0)$. $K_E = K_{LP,P} = 100$ puts epithelial deficit and LP pathogen on one
+scale; on the sterile branch ($P_{LP} \equiv 0$) the total burden reduces to the
+epithelial deficit $K_E - E_h$. It ranges from 0 to $100\sqrt2 \approx 141$. Where it is
+evaluated on a trajectory rather than on a fixed point, negative round-off values of
+$P_{LP}$ are replaced by 0. Its role in attractor ordering, in the gate and in the Treg
+effect is defined in Sections~\ref{sec:ic-line}, \ref{sec:gate} and \ref{sec:classes}.
+
+\subsection{Modifications used by single experiments}
+\label{sec:model-mods}
+
+Three experiments change the right-hand side above, and only there: the efferocytosis
+knockout of Fig.~2 multiplies $g(L)$ by a factor $\varepsilon_{\mathrm{KO}} \in \{0, 1\}$
+(Section~\ref{F-sec:fig1-ko} of the figure methods); the Treg stability and specificity sweep of Fig.~5 and
+Extended Data Figs.~6 and~7 makes Treg reversion depend on $D$ and Treg induction read a noisy
+commensal fraction (Section~\ref{F-sec:fig7} of the figure methods); and the treatments of Supplementary Fig.~3 delay the onset of Treg induction or rescale $\tau_{10}$, $\tau_{t,d}$
+or $\tau_{t,a}$ (Section~\ref{F-sec:figS07} of the figure methods). Every other analysis integrates the
+equations exactly as written above.
+
+%% ===========================================================================
+\section{Numerical methods}
+\label{sec:numerics}
+
+%% ---- from docs/methods_parts/core.tex, lines 194-213
+\subsection{Numerical integration}
+\label{sec:solver}
+
+Every integration uses \texttt{deSolve::ode} with method \texttt{lsodar} (root-finding
+is required by the extinction event), absolute tolerance $10^{-14}$ and relative tolerance
+$10^{-8}$. The sweep uses a maximum internal step $h_{\max} = 5$ and at most $2\times10^{5}$
+steps, to the horizon $T_{\max} = 12{,}000$; the settings of the other analyses are in
+Table~\ref{tab:solver}. The absolute tolerance must lie at least two decades
+below the extinction threshold $10^{-11}$, or the root would fire on integration error;
+\texttt{lib/extinction\_floor.R} refuses to load otherwise. The maximum step is set
+explicitly because \texttt{deSolve} otherwise takes it from the output spacing, which
+for the two-point output grid $\{0, T_{\max}\}$ of the sweep is the whole interval.
+With that default the solver stepped over the stiff tail and returned non-finite
+states, $E_h > K_E$, or a different basin; on test cases $h_{\max} = 10$ still failed
+where $h_{\max} = 5$ did not. The horizon was chosen from the slowest decay rates of
+stable fixed points ($|\mathrm{Re}\,\lambda|$ down to about $5\times10^{-4}$): a mode
+at that rate has decayed to a relative residual of about $2\times10^{-3}$ by
+$t = 12{,}000$, below the $10^{-2}$ tolerance of the convergence check
+(Section~\ref{sec:trust}). In the sweep an integration counts as failed if the solver
+raises an error or a warning, or if its last output time is not $T_{\max}$; 73 Tregs-OFF
+and 29 Tregs-ON lines among the retained combinations contain at least one failed probe
+integration.
+%% from: census [seed]
+
+\subsection{Solver settings by analysis}
+\label{sec:solver-table}
+
+All analyses use the same method, tolerances, extinction floor and non-negativity
+clamp; they differ in horizon, output grid, maximum step and step budget
+(Table~\ref{tab:solver}). In \texttt{deSolve} the step budget (\texttt{maxsteps})
+counts internal steps between two consecutive output times, so with the two-point
+output grid of the sweep it bounds the whole integration. A horizon other than
+$T_{\max} = 12{,}000$ is stated wherever it is used.
+
+\begin{table}[H]
+\centering
+\caption{Solver settings per analysis. Common to all: \texttt{deSolve::ode}, method
+\texttt{lsodar}, absolute tolerance $10^{-14}$, relative tolerance $10^{-8}$, the
+pathogen extinction root at $10^{-11}$ (Section~\ref{sec:units}) and evaluation of the
+right-hand side at $\max(y,0)$; the one exception is the forward stability test of a
+fixed point, which uses method \texttt{lsoda} without the extinction root.
+$h_{\max}$: maximum internal step; steps: maximum internal steps per output interval.}
+\label{tab:solver}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}L l L r r l@{}}
+\toprule
+Analysis & Horizon & Output times & $h_{\max}$ & steps & Section\\\midrule
+main sweep, bisection midpoints & 12{,}000 & $\{0, 12{,}000\}$ & 5 & $2\times10^{5}$ & \ref{sec:solver}\\
+forward stability test of a fixed point (\texttt{lsoda}, no extinction root) & 20{,}000 & $\{0, 20{,}000\}$ & 5 & $10^{5}$ & \ref{sec:fp}\\
+efferocytosis knockout (Figs.~2C--2G) & 12{,}000 & final state only & 5 & $10^{5}$ & \ref{F-sec:fig1}\\
+Figs.~2A, 2B (example) & 4{,}000 & every 2 & 5 & $10^{5}$ & \ref{F-sec:fig1-AB}\\
+load balance (Fig.~3C, Extended Data Figs.~2C and~3) & 12{,}000 & every 0.5 & 5 & $4\times10^{5}$ & \ref{F-sec:fig4}\\
+basin labels at $t = 0$ (Supplementary Figs.~1B, 1C) & 12{,}000 & $\{0, 12{,}000\}$ & 5 & $10^{5}$ & \ref{F-sec:fig5}\\
+Supplementary Fig.~1A (example) & 1{,}000 / 12{,}000 & 0 and 1{,}200 log-spaced from $10^{-3}$ & 5 & $10^{5}$ & \ref{F-sec:fig5}\\
+damage-matched comparison (Fig.~4) & 12{,}000 & 0 and 400 log-spaced from 0.05 & 5 & $10^{5}$ & \ref{F-sec:fig6}\\
+Figs.~4B, 4C (1{,}000 pairs) & 12{,}000 & 0 and 2{,}000 log-spaced from 0.05 & 5 & $10^{5}$ & \ref{F-sec:fig6}\\
+Fig.~4D (one unit, four arms) & 12{,}000 & 0 and 3{,}000 log-spaced from 0.05 & 5 & $10^{5}$ & \ref{F-sec:fig6}\\
+first peak of each arm (Fig.~4, Extended Data Fig.~5) & 12{,}000 & 0 and 2{,}000 log-spaced from 0.05 & 5 & $10^{5}$ & \ref{F-sec:first_peak}\\
+Treg stability and specificity (Fig.~5, Extended Data Figs.~6 and~7) & 12{,}000 & every 1 & 1 & $2\times10^{5}$ & \ref{F-sec:fig7}\\
+phase portraits (Figs.~3A, 3B; Extended Data Figs.~2A, 2B; Supplementary Figs.~2A, 2B) & 12{,}000 & every 2 & 5 & $10^{5}$ & \ref{F-sec:figS01}\\
+Treg treatments (Supplementary Figs.~3B, 3C) & 25{,}000 & 0 and 300 log-spaced from 0.05 & 5 & $10^{5}$ & \ref{F-sec:figS07}\\
+Supplementary Fig.~3A & 12{,}000 & 300 linear on $[0,300]$, 120 log-spaced on $[300, 12{,}000]$ & 5 & $10^{5}$ & \ref{F-sec:figS07}\\
+Supplementary Figs.~3D--3G & 25{,}000 & 0 and 400 log-spaced from 0.05 & 5 & $10^{5}$ & \ref{F-sec:figS07}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+%% ---- from docs/methods_parts/core.tex, lines 215-257
+\subsection{Fixed points and their stability}
+\label{sec:fp}
+
+Fixed points are computed separately for each Treg condition by the reductions in
+\texttt{lib/FP\_finder\_v6.R}.
+
+\emph{Sterile branch} ($P_L = P_{LP} = 0$). At a fixed point every state is a closed-form
+function of the dead-cell load $L$: the damage drive is $A = K_M\,L\,g(L)$,
+$M_1 = A\kappa_E / \big(a\,(\kappa_E K_E - A)\big)$ with $a = \tau_r\beta_r/\mu_R$,
+and $R$, $E_h$, $E_a$, $E_n$, $C_{LP}$, $D$ (and, with $\theta = 1$, $T_r$ and $S$) follow.
+Fixed points are the roots of the scalar residual $G(L) = dM_1/dt$ evaluated on that
+state. $G$ is evaluated on a uniform grid on
+$[0,\ 1.2\,\kappa_E K_E/(K_M a_{\mathrm{floor}})]$ with $\max(6000, 12\,L_{\max})$ points,
+plus a logarithmic sub-scan of the first grid cell (400 points from $10^{-10}$), with
+refinement where $G$ becomes undefined; every sign change is solved by
+\texttt{uniroot} and accepted if $|G| \le 10^{-6}$. $L = 0$ is an exact root (the healthy
+state $E_h = K_E$). Supplied seeds (below) are checked for roots the grid did not bracket.
+
+\emph{Pathogenic branch.} The fixed-point conditions reduce to three residuals in
+$(M_1, P_{LP}, L)$ on each of the two branches of $dP_L/dt = 0$ ($P_L = 0$, or
+$P_L = K_{L,P}(1 - \alpha_{\mathrm{AMP}} D / r_P)$), solved by damped Newton iteration
+(central-difference Jacobian, backtracking line search, convergence at $10^{-9}$,
+acceptance at $10^{-6}$). In the grid-seeded mode Newton starts from
+$M_1 \in \{1, 32.3, 63.7, 95\}$ $\times$ $P_{LP} \in \{0, 0.2, 0.5, 1, 48, 95\}$ $\times$
+$L \in \{1, 5, 30, 100, 400\}$ on both $P_L$ branches, then from every solution found with
+$P_{LP}$ raised to at least 0.2, 0.5 and 2 on the $P_L > 0$ branch. Supplied seeds are
+added. Solutions are de-duplicated after rounding $(E_h, P_{LP}, M_1)$ to three decimals.
+
+\emph{Endpoint seeding.} Both finders accept the final states of integrated
+trajectories as seeds (columns $M_1$, $P_{LP}$, $L$). A final state lies on the attractor
+it reached, so such seeds can only add fixed points.
+
+\emph{Stability.} Each fixed point is classified from the eigenvalues of a reduced
+Jacobian (central differences) in which $M_0 = K_M - M_1$ and $T_0 = K_T - T_r$ are
+eliminated, removing the two zero eigenvalues of the conservation laws; on the sterile
+branch the two pathogen directions are dropped as well (9 variables; 11 on the
+pathogenic branch). On the sterile
+branch the fixed point is \emph{stable} if the largest real part is below $-10^{-8}$, a
+\emph{saddle} if it is above $10^{-8}$, and \emph{marginal} otherwise. On the pathogenic
+branch it is stable below $-10^{-8}$ and a saddle above $10^{-4}$; in between, a forward
+test decides: the fixed point is perturbed by $10^{-3}(|x|+1)$ in every state,
+integrated to $t = 20{,}000$ with the tolerances and maximum step of
+Section~\ref{sec:solver} (method \texttt{lsoda}, at most $10^{5}$ steps, no extinction
+root; Table~\ref{tab:solver}), and called
+stable if the scaled distance at the end is at most five times the initial one (saddle
+if larger, marginal if the integration fails). Only fixed points labeled stable are
+attractors anywhere below.
+
+%% ---- from docs/methods_parts/core.tex, lines 259-351
+\subsection{The initial-condition line, basin assignment and thresholds}
+\label{sec:ic-line}
+
+\subsubsection{Initial conditions}
+
+Every sweep integration starts on one line of initial conditions indexed by the initial
+healthy epithelium $e = E_h(0)$:
+\begin{equation}
+E_h = e,\quad E_n = K_E - e,\quad E_a = 0,\quad M_0 = K_M,\quad T_0 = K_T,\quad
+M_1 = T_r = R = D = S = C_{LP} = 0,
+\label{eq:icline}
+\end{equation}
+and on the pathogenic branch $P_L = 500$, $P_{LP} = 10$ (both zero on the sterile
+branch). The injury is necrotic debris equal to the missing epithelium. $e = 100$ is
+excluded: in the sterile system it is itself a fixed point (a saddle whose unstable
+direction lies along $C_{LP}$), so a trajectory starting there belongs to no basin;
+$e = 99$ leaves its neighborhood long before $T_{\max}$.
+
+\subsubsection{Probe, fixed-point set and labels}
+
+For each combination and condition the line is probed at
+$e \in \{0, 10, 20, \dots, 90, 99\}$ (11 values), each trajectory integrated to $T_{\max}$.
+The \emph{grid-seeded} fixed-point set (sterile: the full $L$ scan; pathogenic: the
+grid-seeded Newton) is computed once per condition and records what exists, saddles
+included. The \emph{endpoint-seeded} set is then computed with the 11 final states as
+seeds; on the pathogenic branch it uses no grid seeds, and if it is empty the
+grid-seeded set is used instead. Among the 2,248,846 retained pathogenic combinations
+this fallback was taken on 56,609 Tregs-OFF and 69,389 Tregs-ON lines; it was never
+needed on the sterile branch.
+%% from: census [seed]
+
+Each final state is assigned to the nearest fixed point of the endpoint-seeded set in
+the scaled squared distance $\sum_v \big((x_v - x_v^*)/(|x_v^*| + 1)\big)^2$ over
+$v \in \{E_h, E_a, E_n, P_{LP}, C_{LP}, M_1, R, D, T_r, S, P_L\}$. The assignment counts
+only if that fixed point is stable; a final state matched to a saddle, a marginal
+point or nothing is \emph{unassigned}.
+
+\subsubsection{Attractor clustering}
+\label{sec:clustering}
+
+\emph{Attractor identity.} Two stable fixed points are the same attractor when they
+agree to within 1 in both $E_h$ and $P_{LP}$ (a Chebyshev ball of radius 1 on
+$(E_h, P_{LP})$; \texttt{lib/attractor\_cluster.R}), grouped by single linkage
+(union--find), which is independent of input order. $K_E = K_{LP,P} = 100$ puts the two
+coordinates on one scale, and one unit of $P_{LP}$ is $10^{11}$ organisms, the scale at
+which two pathogen loads are no longer the same outcome. There is no separate
+extinction clause: a pathogen-free fixed point and one carrying $P_{LP} \le 1$ fall in
+one attractor if they also agree in $E_h$. Attractors are ordered by the total burden $b$ (Eq.~\ref{eq:burden}); the \emph{low-burden attractor} is the group containing the lowest-burden reached
+fixed point, and each group is represented by its lowest-burden member. The
+total burden orders outcomes; it is not used to decide identity, because two states that
+trade epithelial damage against pathogen load can share a burden value (measured
+case: $E_h = 38.7, P_{LP} = 0$ against $E_h = 43.7, P_{LP} = 26.9$, burdens 61.30 and
+62.40).
+
+\emph{Labels.} Each probed $e$ is labeled 1 if its final state belongs to the low-burden attractor,
+0 if it belongs to any other attractor, and is left unlabelled otherwise. The number
+of label changes along the labeled values, $n_{\mathrm{cross}}$, and the number of
+distinct attractors reached, $n_{\mathrm{ray}}$, are recorded; $n_{\mathrm{ray}} = 1
+\Leftrightarrow n_{\mathrm{cross}} = 0$ holds in every retained combination and
+condition. At least one probed value was unassigned on 1,528 Tregs-OFF
+%% from: census [seed]
+and 3,633 Tregs-ON lines.
+
+\subsubsection{\texorpdfstring{The $E_h(0)$ threshold by bisection}{The Eh(0) threshold by bisection}}
+\label{sec:bisection}
+
+When the labels change exactly once, the bracketing pair of probe values is bisected
+(each midpoint integrated, assigned and labeled by the same rule) until the bracket is
+at most \texttt{EH0\_TOL} $= 0.1$ wide, and the threshold $E_h(0)^*$ is the midpoint of
+the final bracket. A bracket of width 10 needs seven halvings, so thresholds lie on a
+lattice of step $10/2^7 = 0.078125$ ($9/2^7 = 0.0703$ in the bracket $[90, 99]$). The side
+on which the low-burden attractor lies is read off the labels and recorded as the
+\emph{direction}: \emph{increasing} if the low-burden attractor is reached above the
+threshold. If the labels change more than once no threshold is reported
+(\texttt{non\_monotonic\_}$k$); if a bisection midpoint cannot be labeled, none is
+reported either (\texttt{bisect\_unlabelled}). Tregs-OFF outcomes among the retained
+combinations: sterile 215,192 single attractor, 160,200 one crossing, 21 more than one
+crossing, 3 unlabelled midpoint; pathogenic 1,172,831, 1,037,904, 36,956 and 1,155.
+%% from: census [seed]
+
+\subsubsection{Convergence check and exclusion}
+\label{sec:trust}
+
+For each probed $e$ with a stable assignment, the relative deviation of the final state
+from its assigned fixed point is $\max_v |x_v - x^*_v|/(|x^*_v|+1)$ over all 13 states.
+A combination is retained only if the median of this deviation over its probed values
+is at most $10^{-2}$ in both conditions (\texttt{pipeline/02\_assemble.R}). This
+excluded 17,769 of 2,642,031 combinations (0.67\%; Tregs-OFF median above the
+tolerance in 11,097, Tregs-ON in 14,402, no stable assignment at all in 150 and 1,305),
+leaving 2,624,262: 375,416 sterile and 2,248,846 pathogenic. The excluded fraction is
+0.44--1.11\% per $r_P$ level (highest at $r_P = 0.08$), 0.34--1.06\% per $K_g$ level
+(highest at 25--30) and 0.63--0.71\% per $\beta_r$ level.
+%% from: census [trust]
+At assembly, fixed points of one combination within the attractor-identity tolerance
+are merged (state vector averaged; the merged point is stable only if every member is)
+and the probe map is re-indexed. In the stored attractor coordinates, values of $P_{LP}$
+in $[-10^{-9}, 0)$ are set to 0 and values below $-10^{-9}$ to missing
+(\texttt{lib/plp\_clean.R}).
+
+%% ===========================================================================
+\section{Parameter sampling and the sweep}
+\label{sec:sampling}
+
+%% ---- from docs/methods_parts/core.tex, lines 124-137
+\subsection{Kinetic parameters}
+
+Twenty-two kinetic parameters were drawn by Latin hypercube sampling in five grids of
+2,000 vectors each (\texttt{pipeline/00\_parameter\_grids.R}). For each parameter, the
+unit interval is divided into 2,000 equal strata, one uniform draw is taken in each,
+and the strata are randomly permuted, independently per parameter. Each strictly
+positive rate constant is mapped log-uniformly onto its range
+($\exp(\log a + u\,(\log b - \log a))$); the dimensionless weight $w$ is mapped
+linearly. Table~\ref{tab:core-kin} gives the ranges; the observed minima and maxima of
+the 10,000 stored vectors lie inside them. The generating script set
+%% from: census [grid]
+no random seed; the five stored grids (\texttt{data/tau\_grid\_v6\_1.rds} to
+\texttt{\_5.rds}) are the only record of the parameter sets and every stage reads them.
+Each vector carries a globally unique key $\texttt{tau\_id} = 10^4 \times
+\text{grid} + \text{row}$, stamped into the grid when it is drawn.
+
+%% ---- from docs/methods_parts/core.tex, lines 172-192
+\subsection{Swept axes and parameter combinations}
+\label{sec:axes}
+
+Three parameters are set on a grid applied to every kinetic vector
+(\texttt{pipeline/01\_sweep.R}): the efferocytosis half-saturation load
+$K_g \in \{15, 20, 25, 30, 35, 40, 45\}$; the ROS production rate
+$\beta_r \in \{0.0015, 0.0025, \dots, 0.0095\}$ (nine levels, step 0.001);
+and the pathogen growth rate $r_P \in \{0, 0.08, 0.16, 0.24, 0.32, 0.40, 0.48\}$. A
+\emph{parameter combination} is a (kinetic vector, $K_g$, $\beta_r$, $r_P$)
+quadruple, 441 per kinetic vector, keyed by
+(\texttt{tau\_id}, $K_g$, $\beta_r$, $r_P$).
+
+\emph{Branches.} $r_P = 0$ defines the \emph{sterile} branch: both pathogen
+compartments start at zero and remain there. $r_P > 0$ defines the
+\emph{pathogenic} branch, which is divided after the gate (Section~\ref{sec:classes})
+into \emph{pathogenic help} and \emph{pathogenic harm} by the effect of Tregs on the
+low-burden attractor.
+
+\emph{Coverage.} The sweep was run on grids 1--3 (6,000 kinetic vectors, $6{,}000 \times 441 = 2{,}646{,}000$ scheduled combinations; grids 4 and 5
+were not swept, but the efferocytosis knockout of Fig.~2 draws from all five grids). 5,991 vectors returned all 441 combinations and nine returned none
+(grid 1 row 1885; grid 3 rows 180, 184, 185, 350, 989, 990, 1024, 1025), giving
+2,642,031 of 2,646,000 combinations. No vector returned a partial set.
+%% from: census [sweep]
+
+%% ===========================================================================
+\section{Classification and the gate}
+\label{sec:classification}
+
+%% ---- from docs/methods_parts/core.tex, lines 353-375
+\subsection{The bistability gate}
+\label{sec:gate}
+
+Every Treg analysis is gated on the Tregs-OFF condition (criteria (1)--(3);
+\texttt{pipeline/03\_select.R}, \texttt{GAP\_CUT} $= 20$) together with one
+commensurability condition on the Tregs-ON line (criterion (4)). A combination passes if
+\begin{enumerate}
+\item the lowest- and highest-burden Tregs-OFF attractors reached from the line are more
+  than 20 burden units apart, $b_{\mathrm{hi}} - b_{\mathrm{lo}} > 20$ (the total burden
+  ranges from 0 to $100\sqrt2 \approx 141$); this requires two reached attractors;
+\item the Tregs-OFF labels change exactly once ($n_{\mathrm{cross}} = 1$), so a single
+  Tregs-OFF threshold exists;
+\item the Tregs-OFF direction is increasing: more healthy epithelium at $t = 0$ reaches
+  the low-burden attractor;
+\item the Tregs-ON line is commensurable with it: either the Tregs-ON threshold is a
+  single increasing crossing, or the Tregs-ON line reaches the low-burden attractor from
+  every probed value. In the kinds of Section~\ref{sec:gap} this keeps \texttt{measured}
+  and \texttt{on\_lo\_basin\_throughout} and discards \texttt{opposite\_directions} and
+  \texttt{none}; the rationale and the per-class effect are given in
+  Section~\ref{sec:excl_decreasing}.
+\end{enumerate}
+The decreasing configuration is a pathogenic phenomenon whose frequency rises with $r_P$
+(36\% of the combinations passing (1)--(2) at $r_P = 0.08$, 66\% at $r_P = 0.48$);
+%% from: census [gate]
+it is not commensurable with the increasing one, because the resolving
+set is $[E_h(0)^*, 99]$ in one and $[0, E_h(0)^*]$ in the other. The gate uses the
+total burden separation; the Chebyshev separation $\max(|\Delta E_h|, |\Delta P_{LP}|)$
+gives the same decision on every sterile combination with two attractors but exceeds 20
+on 384,675 pathogenic combinations against 115,153 for the total burden; the total burden was kept.
+%% from: census [gate]
+
+Table~\ref{tab:gate} follows every parameter combination from the sweep design to the
+classes and rescue-gap kinds of Section~\ref{sec:classes} and~\ref{sec:gap}, with the
+count after every step, per branch. The Treg effect (help, neutral, harm;
+Section~\ref{sec:classes}) is computed for every retained combination, so the columns
+by effect are shown from the convergence check onward; the branches are formed from
+the gated set only, and the effect columns of the earlier rows are for orientation.
+The gated set (\texttt{data/selected\_big.rds}) was recomputed from the assembled
+batches with identical keys and identical class labels. It comes from
+%% from: census [check]
+3{,}139 kinetic vectors (sterile 3{,}133, pathogenic 1{,}035). The pass rate rises with
+$\bros$ (sterile 15.95\% at 0.0015 to 26.70\% at 0.0095; pathogenic 0.85\% to 3.55\%),
+peaks at intermediate $K_g$ (sterile 34.86\% at $K_g = 25$, 4.04\% at 45; pathogenic
+3.84\% at 35, 0.56\% at 15) and falls with $r_P$ (6.55\% at 0.08 to 0.76\% at 0.48).
+
+\begin{table}[H]
+\centering
+\caption{The consolidated gate: parameter combinations after every step, per branch and
+Treg effect. Columns: sterile (all, and by Treg effect; harm does not occur on the
+sterile branch), pathogenic (all, and by Treg effect: help $=$ \emph{pathogenic help}
+branch, harm $=$ \emph{pathogenic harm} branch, neutral $=$ no branch), and total. Gate
+steps (1)--(3) are applied to the Tregs-OFF line only (Section~\ref{sec:gate}).
+``Measured'', ``opposite'', ``none'' and ``censored'' are the rescue-gap kinds of
+Section~\ref{sec:gap}. Bold: the populations of the three branches. Sources: census
+[sweep], [trust], [gate], [class], [gap]; per-effect rescue-gap kinds and per-branch
+returned and excluded counts from \texttt{data/selected\_big.rds} and the sweep coverage
+(5{,}991 complete kinetic vectors $\times$ 63 sterile or 378 pathogenic combinations). The class rows below the gate sum to row~(3) rather than to
+the bolded row~(4), because criterion~(4) is applied after the classification: gated =
+measured + ON\_mono.}
+\label{tab:gate}
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lrrrrrrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{sterile} & \multicolumn{4}{c}{pathogenic} & \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-8}
+step & all & help & neutral & all & help & harm & neutral & total\\\midrule
+scheduled (grids 1--3, 6{,}000 vectors $\times$ 441) & 378{,}000 & & & 2{,}268{,}000 & & & & 2{,}646{,}000\\
+returned by the sweep (5{,}991 vectors) & 377{,}433 & & & 2{,}264{,}598 & & & & 2{,}642{,}031\\
+\quad excluded by the convergence check & 2{,}017 & & & 15{,}752 & & & & 17{,}769\\
+retained & 375{,}416 & 175{,}351 & 200{,}065 & 2{,}248{,}846 & 399{,}870 & 547{,}474 & 1{,}301{,}502 & 2{,}624{,}262\\
+(1) $b_{\mathrm{hi}} - b_{\mathrm{lo}} > 20$ (Tregs OFF) & 89{,}330 & 43{,}377 & 45{,}953 & 115{,}153 & 21{,}710 & 33{,}399 & 60{,}044 & 204{,}483\\
+(2) one Tregs-OFF crossing & 89{,}330 & 43{,}377 & 45{,}953 & 111{,}695 & 21{,}207 & 32{,}109 & 58{,}379 & 201{,}025\\
+(3) Tregs-OFF direction increasing & 89{,}328 & 43{,}375 & 45{,}953 & 57{,}497 & 17{,}495 & 5{,}246 & 34{,}756 & 146{,}825\\
+(4) Tregs-ON line commensurable: \textbf{gated} & \textbf{89{,}322} & 43{,}371 & 45{,}951 & \textbf{52{,}108} & \textbf{14{,}995} & \textbf{2{,}922} & 34{,}191 & \textbf{141{,}430}\\
+\midrule
+class bistable & 78{,}169 & 33{,}491 & 44{,}678 & 54{,}784 & 16{,}225 & 4{,}066 & 34{,}493 & 132{,}953\\
+\quad gap measured & 78{,}163 & 33{,}487 & 44{,}676 & 49{,}395 & 13{,}725 & 1{,}742 & 33{,}928 & 127{,}558\\
+\quad gap opposite directions & 0 & 0 & 0 & 5{,}298 & 2{,}443 & 2{,}313 & 542 & 5{,}298\\
+\quad gap none & 6 & 4 & 2 & 91 & 57 & 11 & 23 & 97\\
+class ON\_mono (gap censored) & 11{,}159 & 9{,}884 & 1{,}275 & 2{,}713 & 1{,}270 & 1{,}180 & 263 & 13{,}872\\
+class mono\_A, unresolved\_on & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+\bottomrule
+\end{tabular}}
+\end{table}
+%% from: census [sweep] [trust] [gate] [class] [gap]; per-branch returned = 5,991 x 63 and
+%% 5,991 x 378 (no vector returned a partial set); excluded = returned - retained.
+%% Rescue-gap kinds by effect: selected_big.rds, dcast(rescue_gap_kind ~ branch x treg_effect),
+%% recomputed at assembly (scratch chk3.R); they reproduce census [gap] for the three branches.
+
+%% ---- from docs/methods_parts/core.tex, lines 409-413
+Losses at each step: (1) removed 286,086 sterile and 2,133,693 pathogenic combinations
+(one attractor reached, 215,192 and 1,172,831, or two attractors 20 or fewer burden
+units apart); (2) removed 3,458 pathogenic combinations with two Tregs-OFF crossings and
+no sterile one; (3) removed 2 sterile combinations (bisection midpoint unlabelled, no
+direction) and 54,198 pathogenic ones (53,881 decreasing, 317 unlabelled midpoint).
+
+%% ---- from docs/methods_parts/core.tex, lines 415-444
+\subsection{What Tregs do: classes, effect and branches}
+\label{sec:classes}
+
+\emph{Classes.} Each gated combination is classified by its Tregs-ON line:
+\begin{itemize}
+\item \textbf{bistable}: the Tregs-ON line reaches two or more attractors;
+\item \textbf{ON\_mono} (\texttt{mono\_B} in the code): the Tregs-ON line reaches a
+  single attractor, and that attractor is the low-burden one. This is recognized in one
+  of two ways: the sweep records the low-burden attractor as reached from every probed
+  value, or, failing that, the single Tregs-ON attractor lies closer in total burden to the
+  Tregs-OFF low-burden attractor than to the Tregs-OFF high-burden one;
+\item \textbf{mono\_A}: a single Tregs-ON attractor that lies closer to the Tregs-OFF
+  high-burden attractor;
+\item \textbf{unresolved\_on}: no Tregs-ON attractor was recovered.
+\end{itemize}
+Every one of the 13,872 ON\_mono combinations was labeled by the first rule; mono\_A
+and unresolved\_on did not occur. ON\_mono is a statement about the initial-condition
+line only: a second stable Tregs-ON fixed point exists off the line (grid-seeded set)
+in 763 of 11,159 sterile, 581 of 1,270 pathogenic help and 554 of 1,180 pathogenic harm
+ON\_mono combinations.
+%% from: census [class] [gap]
+
+\emph{Treg effect.} The effect of Tregs is judged on the low-burden attractor:
+$\Delta b_{\mathrm{lo}} = b(E_h^{\mathrm{lo,ON}}, P_{LP}^{\mathrm{lo,ON}}) -
+b(E_h^{\mathrm{lo,OFF}}, P_{LP}^{\mathrm{lo,OFF}})$, recomputed from the stored attractor
+coordinates. It is \emph{help} if $\Delta b_{\mathrm{lo}} < -1$, \emph{harm} if
+$\Delta b_{\mathrm{lo}} > 1$, \emph{neutral} otherwise (effect tolerance $\delta = 1$,
+\texttt{EFFECT\_TOL}). The
+total burden weights one unit of epithelial damage equally with one unit of LP pathogen;
+$K_E = K_{LP,P}$ puts the two on the same scale. The effect answers a different question
+from the rescue gap below, and the two can disagree in the same combination.
+
+\paragraph{Coverage of the help class.} The help class is not confined to a corner of the
+grid. Among the gated pathogenic combinations it is populated at every pathogen growth rate,
+from 35.0\% of combinations at $r_P = 0.08$ falling monotonically to 22.3\% at $r_P = 0.48$
+(8{,}558 of 24{,}433 down to 633 of 2{,}842), and at every ROS production rate, between 27.2\%
+at $\beta_r = 0.0015$ and 32.7\% at $\beta_r = 0.0035$ (579 of 2{,}127 and 1{,}752 of 5{,}351),
+as well as at every $K_g$. Jointly the coverage is almost but not quite complete: 53 of the 54
+$(\beta_r, r_P)$ cells hold help combinations, the exception being the corner of the weakest
+response against the fastest pathogen, $\beta_r = 0.0015$ with $r_P = 0.48$, which holds 39
+combinations and no help; its neighbor $(0.0015, 0.40)$ holds one of 67.
+% from: scratchpad chk_help.R, on data/selected_big.rds
+
+\emph{Branches.} \emph{Sterile}: all gated combinations with $r_P = 0$.
+\emph{Pathogenic help} and \emph{pathogenic harm}: gated combinations with $r_P > 0$ and
+that effect. The 34,191 gated pathogenic neutral combinations belong to no branch.
+
+%% ---- from docs/methods_parts/core.tex, lines 459-462
+The gated sterile branch holds 78,163 bistable and 11,159 ON\_mono combinations (help and
+neutral pooled; harm does not occur); gated pathogenic help 13,725 and 1,270 (14,995);
+gated pathogenic harm 1,742 and 1,180 (2,922). The branch files
+\texttt{data/skeleton\_<branch>.rds} and \texttt{data/rescue\_<branch>.rds} were written before
+criterion~(4) and hold the larger criterion-(3) populations: 78,169 and 11,159 sterile,
+16,225 and 1,270 pathogenic help, 4,066 and 1,180 pathogenic harm.
+
+%% ---- from docs/methods_parts/core.tex, lines 464-511
+\subsection{The rescue gap}
+\label{sec:gap}
+
+For a combination whose Tregs-OFF and Tregs-ON thresholds are both located and run in
+the same direction, the rescue gap is
+\begin{equation}
+\Delta E_h(0)^* = \begin{cases}
+E_h(0)^*_{\mathrm{OFF}} - E_h(0)^*_{\mathrm{ON}}, & \text{increasing},\\
+E_h(0)^*_{\mathrm{ON}} - E_h(0)^*_{\mathrm{OFF}}, & \text{decreasing},
+\end{cases}
+\label{eq:gap}
+\end{equation}
+the additional range of initial epithelial damage from which the tissue reaches the
+low-burden attractor when Tregs are present (kind \texttt{measured}). Thresholds running
+in opposite directions are not comparable and give no gap (kind
+\texttt{opposite\_directions}); a combination with a missing Tregs-ON threshold and a
+Tregs-ON line that is not entirely low-burden has none either (kind \texttt{none}). When
+the Tregs-ON line reaches the low-burden attractor from every probed value (all ON\_mono
+combinations), the recorded value is the whole resolving extension of the line,
+$E_h(0)^*_{\mathrm{OFF}} - 0$, flagged as censored (kind \texttt{on\_lo\_basin\_throughout}).
+Because both thresholds lie on the bisection lattice, measured gaps are multiples of
+0.078125 (one sterile gap of 78,163 lies on the $[90,99]$ lattice instead), and a gap of
+0 means a shift smaller than one lattice step, not the absence of a shift.
+
+\begin{table}[H]
+\centering
+\caption{Rescue gaps of the bistable class per branch (percentages of the
+measured gaps). All measured gaps run increasing in both arms.}
+\label{tab:core-gap}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lrrr}
+\toprule
+ & sterile (help + neutral) & pathogenic help & pathogenic harm\\\midrule
+bistable & 78,169 & 16,225 & 4,066\\
+\quad measured & 78,163 & 13,725 & 1,742\\
+\quad opposite directions & 0 & 2,443 & 2,313\\
+\quad none & 6 & 57 & 11\\
+measured: exactly 0 & 53.1\% & 58.7\% & 65.7\%\\
+measured: $\le$ one step (0.078125) & 73.3\% & 78.1\% & 81.6\%\\
+measured: $> 0$ & 46.9\% & 41.3\% & 34.0\%\\
+measured: $< 0$ (count) & 0 & 3 & 4\\
+90th / 99th percentile & 0.55 / 4.06 & 0.31 / 2.42 & 0.31 / 3.14\\
+maximum & 48.59 & 33.28 & 17.11\\
+ON\_mono (censored) & 11,159 & 1,270 & 1,180\\
+\quad recorded extension, median (range) & 27.54 (0.04--83.95) & 25.78 (0.04--98.61) & 28.16 (0.04--80.98)\\
+\bottomrule
+\end{tabular}}
+\end{table}
+%% from: census [gap] and [skel]; 90th/99th percentiles printed as 0.5469/4.0625,
+%% 0.3125/2.4219, 0.3125/3.1391.
+
+%% ---- from docs/methods_parts/fig02_03.tex, lines 464-469
+\emph{The rescue-gap floor.} A measured gap is said to be \emph{at the floor} if
+$\gap \le 1.01\times0.078125$, which includes the exact zeros; in the bisection such a pair
+of thresholds was not separated. The floor fractions of Table~\ref{tab:core-gap} (exactly 0:
+53.1\% sterile, 58.7\% pathogenic help; at most one lattice step: 73.3\% and 78.1\%), the
+three negative pathogenic help gaps and the maxima 48.59 and 33.28 were obtained
+independently from the branch files by \texttt{pipeline/24\_numbers\_load\_balance\_boundary.R} and
+agree. Supplementary Fig.~1 excludes gaps at the floor (Section~\ref{F-sec:fig5} of the figure methods).
+%% from: pipeline/24_numbers_fig04_05.R, block "gap_floor"; census [gap]; re-checked at assembly
+%% from selected_big.rds (exact zeros 41,477/78,163, 8,059/13,725, 1,145/1,742)."
+
+%% ===========================================================================
+\subsection{Exclusion of combinations whose Tregs-ON threshold inverts}
+\label{sec:excl_decreasing}
+
+A combination is retained for analysis only if its Tregs-ON threshold is a single
+increasing crossing, or if the Tregs-ON line reaches the low-burden attractor from every
+probed value. In the kinds of Section~\ref{sec:gap} this keeps \texttt{measured} and
+\texttt{on\_lo\_basin\_throughout} and discards \texttt{opposite\_directions} and
+\texttt{none}.
+
+The reason is interpretive rather than numerical. In the discarded
+\texttt{opposite\_directions} combinations the Tregs-OFF threshold runs increasing, so the
+low-burden attractor is reached from the healthier initial conditions as expected, while
+the Tregs-ON threshold runs decreasing, so with Tregs the low-burden attractor is reached
+from the \emph{more} injured ones. A regime in which a larger initial injury yields the
+better outcome is outside the range of behaviour we interpret, and we remove it rather
+than report it. The runs themselves are clean: each has exactly one crossing per arm and
+no solver note, and every attractor coordinate is finite, so this is a modelling
+judgement and not a repair of failed integrations. The \texttt{none} kind is discarded on
+the separate ground that its Tregs-ON arm could not be labelled at all.
+
+The criterion applies to every branch and to both Treg-effect classes, so that no
+comparison is made between differently filtered populations. Its effect is confined to
+the pathogenic branch: the sterile branch contains no combination with a decreasing
+Tregs-ON threshold and loses six of 89,328 to the \texttt{none} kind. In the pathogenic
+branch it removes 2,313 of 4,066 bistable harm combinations and 2,443 of 16,225 bistable
+help combinations, together with 542 neutral and the 91 \texttt{none} combinations across
+the three classes, leaving 2,922 harm, 14,995 help and 34,191 neutral combinations of
+52,108 in total. ON\_mono combinations are unaffected, since their recorded extension is
+the whole line rather than a difference between two crossings.
+
+The damage-matched experiment of Figure~4 inherits the same criterion, which reduces its
+sample from 11,940 pairs to 8,789 and the median $\beta_r^{*}/\beta_r$ from 2.19 to 1.89.
+The excluded pairs are those for which the largest increase in aggression is affordable:
+taken alone their median ratio is 5.13. The qualitative results are unchanged.
+$\beta_r^{*} > \beta_r$ in every retained pair, the first pathogen peak is lower with
+Tregs in every retained pair, and the cumulative load over the matching window is lower
+with Tregs in 89.3\% of them, against 86.5\% before the exclusion.
+
+The criterion was already in force wherever a rescue gap is plotted or averaged, since
+those panels require a finite gap (\texttt{lib/fig\_skeleton.R}); stating it here makes
+the counts reported in the text agree with the sample sizes shown in the figures. It is
+\emph{not} a statement about how often such a regime arises, for the same reason given
+for every other count in this work.
+%% from: lib/fig_damage_matched.R (EXCLUDE_DECREASING, default on); counts re-derived
+%% from selected_big.rds and the skeleton branch files 2026-11-06; the damage-matched
+%% figures were re-rendered and the unfiltered run reproduces every pre-exclusion number.
+
+%% ===========================================================================
+\section{Statistical analysis}
+\label{sec:stats}
+
+All results are properties of deterministic (or, in Fig.~5, stochastic) simulations of
+the model over sampled parameter sets. The sampled parameter space has no known
+population distribution, so every proportion is a proportion of the sample or of the
+stated population of parameter combinations or units, not a frequency in a biological
+population, and no inferential statement refers to a population beyond the sample. The
+statistics used, and where:
+
+\begin{itemize}
+\item \emph{Medians, interquartile ranges and ranges} summarize every distribution in
+  the endpoint tables. Quantiles are R \texttt{quantile} type 7 unless stated.
+\item \emph{Percentile bootstrap} (Figs.~2F, 2G; Section~\ref{F-sec:fig1-FG} of the figure methods): 95\%
+  interval of the subsampled median $S(x)$ from 400 subsamples of 13 units per stratum
+  drawn with replacement (units, not pairs), seed 1.
+\item \emph{Spearman rank correlation}: Supplementary Figs.~1B, 1C, $G_X$ against the rescue gap
+  (\texttt{cor.test}, \texttt{exact = FALSE}, asymptotic $p$; Table~\ref{F-tab:gainstats} of the figure methods);
+  Supplementary Fig.~3B, $d^\ast$ against $t_{\mathrm{dip}}$ ($\rho = 0.994$),
+  Table~\ref{F-tab:harm_dose} of the figure methods, least sufficient ladder step against $t_{\mathrm{dip}}$,
+  and the diagnostic correlations of Section~\ref{F-sec:figS07} of the figure methods (coefficient only,
+  R \texttt{cor}; no $p$ value is computed or reported).
+\item \emph{Ordinary least squares on log--log axes}: Supplementary Figs.~1B, 1C
+  ($\log_{10}\gap$ on $\log_{10} G_X$, drawn lines, no interval); Supplementary Fig.~3B (slope of $\log_{10} d^\ast$ on $\log_{10} t_{\mathrm{dip}}$ with its 95\%
+  confidence interval, 1.126, 1.107--1.146).
+\item \emph{Two-sample Kolmogorov--Smirnov test} (Section~\ref{F-sec:fig5} of the figure methods): the rescue
+  gaps of the bistable combinations in the measured sterile subsample against the whole
+  sterile pool ($D = 0.0047$, $p = 0.95$), used to check that the subsample is random,
+  not to test a hypothesis about the model.
+\item \emph{Wilson score intervals} (95\%; the two figures of the appendix, panels U--X)
+  for the fraction of combinations not harmed at each treatment level, treating the
+  combinations as independent draws; all levels are evaluated on the same combinations,
+  so the intervals describe each level separately and are not a test between levels.
+\item \emph{Kernel density estimates}: bivariate Gaussian (\texttt{MASS::kde2d}, default
+  bandwidth) for the highest-density regions and modes of Figs.~2C--2E; univariate
+  Gaussian (R \texttt{density}, default bandwidth) for the violins of Extended Data Fig.~1
+and Supplementary Fig.~2. The histograms of Extended Data Fig.~5 are counts in
+  bins on a pseudo-logarithmic axis, not densities.
+\item \emph{Quantile fans} (Figs.~5A, 5B; Extended Data Figs.~6A, 6B; Extended Data Figs.~7C--7F): nine nested
+  central quantile intervals across units.
+\end{itemize}
+
+No other test is performed. Fig.~3C, Extended Data Figs.~2C and~3, Fig.~4, Fig.~5,
+Extended Data Fig.~6 and Extended Data Fig.~7 contain no test or interval other than those listed; in
+particular Fig.~4 contains no bootstrap, test or correlation, and Fig.~3C and Extended Data Fig.~2C shows a
+random display subset of 20 trajectories per branch on which no statistic is computed.
+No correction for multiple comparisons is applied, because no family of hypothesis
+tests is interpreted.
+
+\emph{Random seeds.} Unit and combination draws: Fig.~2, seed 1
+(\texttt{pipeline/06\_effero\_knockout.R}); Fig.~3C, Extended Data Figs.~2C and~3,
+seed 1 (\texttt{pipeline/20\_load\_balance.R}), display subset seed 1 re-set per branch;
+Supplementary Fig.~1, pool permutation seed 20260820 (\texttt{pipeline/21\_corridor\_tzero.R}),
+display subsample seed 1; Fig.~4, unit draw seed 1
+(\texttt{pipeline/43\_damage\_matched\_gated\_units.R}), trajectory subset seed 1
+(\texttt{pipeline/41\_damage\_matched\_trajectories.R}), label placement seed 1
+(\texttt{ggrepel});
+Fig.~5, unit draw seed 1 (\texttt{pipeline/60\_imperfect\_sample.R}), noise seeds
+$20260917 + 1000\cdot\mathrm{unit} + \mathrm{replicate}$
+(\texttt{pipeline/61\_imperfect\_sweep.R}); Extended Data Fig.~1 and Supplementary Fig.~2, jitter
+seed 1; Supplementary Fig.~3A, seed 3 (\texttt{pipeline/51\_harm\_explore\_sample.R});
+Fig.~2 bootstrap, seed 1. The main sweep, the knockout integrations,
+the boundary scans, the damage-matched search and the treatment arms are deterministic.
+The kinetic parameter grids were drawn without a seed (Section~\ref{sec:sampling}).
+
+%% ===========================================================================
+\section{Limitations imposed by the data}
+\label{sec:limitations}
+
+The following restrictions follow from how the data were generated. Each is stated
+where it applies; they are collected here.
+
+\begin{enumerate}
+\item \emph{Sterile boundary scans are a subsample.} The $t=0$ boundary scans of
+  Supplementary Fig.~1 cover 16{,}990 of the 89{,}328 sterile combinations that passed criterion~(3)
+  (19.0\%); the remaining 72{,}338 were never measured. Supplementary Fig.~1B and every sterile number of
+  Section~\ref{F-sec:fig5} of the figure methods rest on this random subsample, whose composition matches the
+  pool (ON\_mono share, rescue-gap distribution). The pathogenic help pool was measured
+  in full.
+\item \emph{Fig.~2 uses final states, not attractors.} The knockout experiment computes
+  no fixed points, checks no stability and applies no convergence test; a low-burden
+  basin is defined by the spread ($>20$ burden units) of the final states at
+  $t = 12{,}000$ along the initial-condition line, and a line still moving at that time is
+  classified by where it is. In the pathogenic branch the lower-burden final state
+  carries more pathogen than the higher-burden one in about half of the systems
+  (lower $P_{LP}$ in 49.4\%), so ``lower burden'' there does not mean pathogen
+  clearance. Figs.~2F, 2G pool all seven $K_g$ arms of each qualifying unit, and the
+  plotted subsampled median hides a wide spread of its per-$K_g$ values
+  (Table~\ref{F-tab:fig01-FG} of the figure methods). Each point rests on 13 units per stratum (78 in F, 117
+  in G), the size of the smallest ($\bros$, $r_P$) cell after the additional draws.
+\item \emph{ON\_mono is a statement about the initial-condition line.} A second stable
+  Tregs-ON fixed point exists off the line in 763 of 11{,}159 sterile, 581 of 1{,}270
+  pathogenic help and 554 of 1{,}180 pathogenic harm ON\_mono combinations, and three
+  pathogenic ON\_mono Tregs-ON trajectories of Extended Data Fig.~3 reach a
+  high-burden state. ON\_mono means that no probed initial condition of the line
+  reaches a high-burden attractor under Tregs, not that none exists.
+\item \emph{The rescue gap has a resolution of one bisection step} (0.078125). A gap of 0
+  means a threshold shift smaller than this step; 53.1\% (sterile), 58.7\% (pathogenic
+  help) and 65.7\% (pathogenic harm) of the measured gaps are exactly 0.
+\item \emph{The Fig.~5 rescue criterion ignores pathogen load.} A run is rescued when
+  its tail-mean dead-cell load is below $K_g$; in the pathogenic help branch 258{,}692 of
+  367{,}762 rescued runs keep a tail-mean $P_{LP} > 1$.
+\item \emph{Missing runs in the Fig.~5 sweep.} 50 complete (unit, replicate) items, all
+  pathogenic help (6{,}050 Tregs-ON runs), are absent from the merged output; the stored
+  output cannot distinguish an item that never completed from one whose runs were all
+  removed by the run filter. Eleven units lose their Tregs-OFF run with them and are
+  dropped; the remaining cells carry 7--10 replicates, and every cell of the 440 units
+  of Fig.~5 carries 10. The noise jump times are not passed
+  to the solver as critical times (checked on a sample with $h_{\max} = 0.1$).
+\item \emph{Gate metric.} The gate separates attractors by the total burden; the
+  Chebyshev separation would pass 384{,}675 pathogenic combinations instead of 115{,}153.
+  The decreasing Tregs-OFF configuration (53{,}881 pathogenic combinations) is excluded.
+\item \emph{Pathogenic boundary-scan disagreement.} In 5{,}007 pathogenic combinations
+  the Tregs-OFF attractor separation of the boundary stage and of the sweep differ by
+  more than 1\% on $P_{LP}$ only, at absolute differences of order $10^{-10}$; they are
+  kept in Supplementary Fig.~1C (excluding them changes $\rho$ by at most 0.06).
+\item \emph{Fig.~4 proportions} are proportions of the 52{,}010 units run (a uniform
+  subsample of a uniform draw from the gated pathogenic combinations in which the pathogen
+  persists without Tregs), not frequencies in a population; the units of the draw that the
+  cluster tasks did not reach before their time limit are in random order, so their absence
+  does not bias the sample.
+\item \emph{Treg treatments.} 26 of the 1{,}771 integrated harm combinations are not
+  harmed when integrated untreated (their branch was assigned on the fixed points); they
+  have no threshold. The numerical robustness of the extreme point of Supplementary Fig.~3B was not re-examined on the final data.
+\item \emph{Parameter grids.} The kinetic grids were drawn without a random seed and
+  cannot be regenerated; the stored grids are the record. Only grids 1--3 were swept;
+  the knockout experiment of Fig.~2 draws from all five grids.
+\end{enumerate}
+
+%% ===========================================================================
+\section{Software and reproducibility}
+\label{sec:software}
+
+\emph{Software.} All computations were done in R. Local runs and all figure renders used
+R 4.6.1 (aarch64 macOS) with \texttt{deSolve} 1.42 (integration), \texttt{data.table}
+1.18.4, \texttt{ggplot2} 4.0.3, \texttt{patchwork} 1.3.2, \texttt{scales} 1.4.0,
+\texttt{ggrepel} 0.9.8, \texttt{MASS} 7.3.65 (\texttt{kde2d}), \texttt{gtable} 0.3.6,
+\texttt{viridisLite} 0.4.3, \texttt{ggnewscale} 0.5.2, \texttt{ggh4x} 0.3.1 and the base
+packages \texttt{parallel}, \texttt{grid} and \texttt{stats}.
+%% from: Rscript -e 'packageVersion(...)' on 2026-10-01; R.version.string; Sys.info()
+Cluster stages ran under Slurm on the \texttt{della} cluster, with R taken from a
+conda environment (module \texttt{anaconda3/2023.3}); the R and \texttt{deSolve}
+versions of that environment were not recorded with the outputs. Re-integrations of
+cluster outputs on the local installation agree with the stored values to the
+precision given below.
+
+\emph{Computation.} Main sweep: Slurm array of 400 single-core tasks per grid (24 h wall
+time, 4 GB per core; \texttt{pipeline/cluster/sweep\_array.sh}).
+Efferocytosis knockout: 1{,}764{,}000 integrations, about 19.5 h on 10 cores (about 195
+core-hours, or about 67 s per unit per core). Damage-matched experiment (Fig.~4): Slurm array of 400 single-core
+tasks (8 h wall time; about 340 integrations and 3.7 core-minutes per unit; every task
+reached the wall time), \texttt{pipeline/cluster/damage\_matched\_gated.sh}. Boundary scans of Supplementary Fig.~1: Slurm arrays of 400 single-core tasks
+(12 h wall time; about 15 core-minutes per combination); the sterile array exceeded its
+wall time, and only its first round was recovered (Section~\ref{F-sec:fig5} of the figure methods).
+Stability--specificity sweep: four waves of 400
+single-core Slurm tasks (23 h 59 min wall time), 26{,}982 core-hours in total. Treg
+treatments: one 32-core node, 130.5 min for the arms and 85.9 min for the thresholds.
+Load-balance trajectories: about 2.5 min per branch on 6 cores.
+
+\emph{Stored versus re-run stages.} Expensive integration stages were run once and their
+outputs are the data of record; cheap stages were re-run from them, and each expensive
+stage was spot-checked by re-integrating a subset on the local installation:
+\begin{itemize}
+\item \emph{Main sweep} (\texttt{pipeline/01\_sweep.R}, \texttt{02\_assemble.R}): stored.
+  The selection stage (\texttt{03\_select.R}) re-run on the stored batches reproduces the
+  gated set and the six branch files exactly (\texttt{identical()}). The number of
+  assembly merges that joined a pathogen-free fixed point to a pathogen-carrying one was
+  not recorded and cannot be reported.
+\item \emph{Efferocytosis knockout} (\texttt{06\_effero\_knockout.R}): stored; the unit
+  draw re-run (all 10{,}500 units reproduced); three units (504 integrations) re-integrated,
+  every final state reproduced to within $3\times10^{-12}$ and the one failed run failing
+  again.
+\item \emph{Load balance} (\texttt{20\_load\_balance.R}): re-run in full (3{,}360
+  trajectories); same combinations and initial conditions, every series of the same
+  length, largest absolute difference $2.6\times10^{-4}$ in a stored value.
+\item \emph{Boundary scans} (\texttt{21\_corridor\_tzero.R}): stored; two pathogenic
+  combinations re-integrated, all 16 (combination, coordinate) rows matching (categorical
+  columns, counts and rescue gaps identical; boundaries within $4\times10^{-7}$ absolute
+  except on a coordinate whose basin span is $6\times10^{-11}$). Attractor coordinates
+  and positions (\texttt{22}, \texttt{23}) re-run, identical. The panel-A boundary sweep
+  of Supplementary Fig.~1 is read from its stored cache.
+\item \emph{Damage-matched experiment} (\texttt{40\_damage\_matched.R}): stored; 11 units
+  covering every search outcome re-run, every numeric column and status identical. The
+  stored trajectory subset (\texttt{41}) is the seed-1 draw of 1{,}000 pairs from the current
+  filter, so panels B and C use the whole draw. The first peak
+  of each arm (\texttt{42}) is stored for all 11{,}940 pairs the filter selects before the
+  exclusion of inverted Tregs-ON thresholds, so it covers all 8{,}789 pairs of the current
+  filter, and both arms returned a complete integration. The window damage of criterion 3 (\texttt{44}) is stored for
+  all 48{,}842 robust pairs.
+\item \emph{Stability--specificity sweep} (\texttt{61\_imperfect\_sweep.R}): stored; unit draw
+  (\texttt{60}) and rescue probabilities (\texttt{63}) re-run, identical; one (unit,
+  replicate) item partly re-integrated (12 of its runs), tail means agreeing to the seventh significant
+  digit (largest relative difference $1.5\times10^{-5}$, in a tail variance) and every
+  rescue outcome identical. The merge stage (\texttt{62}) needs the per-task output, which
+  is held only on the cluster, and was not re-run.
+\item \emph{Treg treatments} (\texttt{50\_harm\_rescue\_compute.R}): stored; four
+  combinations re-integrated (all 168 arm rows and 12 thresholds identical). The
+  help-versus-harm sample of Supplementary Fig.~3A (\texttt{51}) re-run,
+  bit-identical.
+\end{itemize}
+Every figure is rendered from the stored data by its script; apart from the
+re-integrations named in the figure sections, no figure script integrates the model.
+
+%% ===========================================================================
+\end{document}
+

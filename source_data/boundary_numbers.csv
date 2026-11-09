@@ -1,0 +1,109 @@
+block,group,item,value
+pool,sterile,pool (bistable + mono_B),89328
+pool,sterile,pool bistable,78169
+pool,sterile,pool mono_B,11159
+pool,sterile,measured combinations,16990 (19.0%)
+pool,sterile,measured bistable,14895
+pool,sterile,measured mono_B,2095
+pool,sterile,mono_B share pool / measured (pct),12.49 / 12.33
+pool,sterile,"bistable rescue gap: pct > one step, pool / measured",26.66 / 26.19
+pool,sterile,"bistable rescue gap: KS test measured vs pool, D and p","D = 0.0047, p = 0.945"
+notes,sterile,per-combination outcome: ok,16990
+base,sterile,base_frac distribution,0.02: 118928 rows
+base,sterile,combinations with base rung 0.02,16990 of 16990
+pool,pathogenic_help,pool (bistable + mono_B),17495
+pool,pathogenic_help,pool bistable,16225
+pool,pathogenic_help,pool mono_B,1270
+pool,pathogenic_help,measured combinations,17495 (100.0%)
+pool,pathogenic_help,measured bistable,16225
+pool,pathogenic_help,measured mono_B,1270
+pool,pathogenic_help,mono_B share pool / measured (pct),7.26 / 7.26
+pool,pathogenic_help,"bistable rescue gap: pct > one step, pool / measured",21.90 / 21.90
+pool,pathogenic_help,"bistable rescue gap: KS test measured vs pool, D and p","D = 0.0000, p = 1"
+notes,pathogenic_help,per-combination outcome: ok,17495
+base,pathogenic_help,base_frac distribution,0.02: 138984 rows
+base,pathogenic_help,combinations with base rung 0.02,17495 of 17495
+ledger,sterile,bistable combinations with note ok,14895
+ledger,sterile,coord Ea,"rows 6369; both walls (measured) 6365; G>0 6365; gap finite, uncensored, >0 4352; at floor 1550; plotted 2802"
+ledger,sterile,coord En,"rows 6369; both walls (measured) 6363; G>0 6363; gap finite, uncensored, >0 4352; at floor 1550; plotted 2802"
+ledger,sterile,coord M1,"rows 6369; both walls (measured) 6326; G>0 6326; gap finite, uncensored, >0 4313; at floor 1550; plotted 2763"
+ledger,sterile,coord R,"rows 6369; both walls (measured) 6362; G>0 6362; gap finite, uncensored, >0 4351; at floor 1550; plotted 2801"
+ledger,sterile,coord D,"rows 6369; both walls (measured) 6364; G>0 6364; gap finite, uncensored, >0 4352; at floor 1550; plotted 2802"
+q_kind,sterile,Ea measured,14890
+q_kind,sterile,En measured,14887
+q_kind,sterile,M1 measured,14845
+q_kind,sterile,R measured,14887
+q_kind,sterile,D measured,14889
+q_kind,sterile,M1 on_absent,40
+q_kind,sterile,Ea on_ambiguous,2
+q_kind,sterile,En on_ambiguous,3
+q_kind,sterile,R on_absent,2
+q_kind,sterile,D on_ambiguous,2
+q_kind,sterile,En no_off_wall,5
+q_kind,sterile,R no_off_wall,5
+q_kind,sterile,D no_off_wall,3
+q_kind,sterile,M1 no_off_wall,4
+q_kind,sterile,M1 on_ambiguous,6
+q_kind,sterile,R on_ambiguous,1
+q_kind,sterile,Ea no_off_wall,3
+q_kind,sterile,D on_absent,1
+mono_B,sterile,Ea rows / no ON wall in range / both walls,2094 / 1970 (94.1%) / 124
+mono_B,sterile,En rows / no ON wall in range / both walls,2094 / 1970 (94.1%) / 124
+mono_B,sterile,M1 rows / no ON wall in range / both walls,2095 / 2018 (96.3%) / 76
+mono_B,sterile,R rows / no ON wall in range / both walls,2095 / 2001 (95.5%) / 93
+mono_B,sterile,D rows / no ON wall in range / both walls,2095 / 1967 (93.9%) / 127
+stats,sterile,M1,n 2763; rho 0.942; p 0; OLS log10(gap) = -1.702 + 0.842 log10(G); G median 35.6% (IQR 18.4-88.5)
+stats,sterile,D,n 2802; rho 0.940; p 0; OLS log10(gap) = -1.757 + 0.896 log10(G); G median 34.7% (IQR 17.9-85.9)
+stats,sterile,R,n 2801; rho 0.939; p 0; OLS log10(gap) = -1.758 + 0.935 log10(G); G median 30.0% (IQR 15.8-72.3)
+stats,sterile,En,n 2802; rho 0.937; p 0; OLS log10(gap) = -1.762 + 0.931 log10(G); G median 31.3% (IQR 16.2-75.0)
+stats,sterile,Ea,n 2802; rho 0.937; p 0; OLS log10(gap) = -1.763 + 0.933 log10(G); G median 30.9% (IQR 16.1-74.5)
+stats,sterile,distinct combinations plotted (any coordinate),2805
+stats,sterile,rows pooled over coordinates / drawn,13970 / 9000
+ledger,pathogenic_help,bistable combinations with note ok,16225
+ledger,pathogenic_help,coord Ea,"rows 16225; both walls (measured) 15312; G>0 14792; gap finite, uncensored, >0 5203; at floor 2515; plotted 2688"
+ledger,pathogenic_help,coord En,"rows 16221; both walls (measured) 15400; G>0 14869; gap finite, uncensored, >0 5251; at floor 2537; plotted 2714"
+ledger,pathogenic_help,coord M1,"rows 16225; both walls (measured) 14113; G>0 14034; gap finite, uncensored, >0 4743; at floor 2376; plotted 2367"
+ledger,pathogenic_help,coord R,"rows 16225; both walls (measured) 15248; G>0 14819; gap finite, uncensored, >0 5166; at floor 2510; plotted 2656"
+ledger,pathogenic_help,coord D,"rows 16199; both walls (measured) 14365; G>0 14364; gap finite, uncensored, >0 5064; at floor 2434; plotted 2630"
+ledger,pathogenic_help,coord PLP,"rows 16221; both walls (measured) 15209; G>0 14686; gap finite, uncensored, >0 5154; at floor 2494; plotted 2660"
+q_kind,pathogenic_help,Ea no_off_wall,386
+q_kind,pathogenic_help,En no_off_wall,347
+q_kind,pathogenic_help,M1 no_off_wall,1526
+q_kind,pathogenic_help,R no_off_wall,434
+q_kind,pathogenic_help,D no_off_wall,1197
+q_kind,pathogenic_help,Ea measured,15312
+q_kind,pathogenic_help,En measured,15400
+q_kind,pathogenic_help,M1 measured,14113
+q_kind,pathogenic_help,R measured,15248
+q_kind,pathogenic_help,D measured,14365
+q_kind,pathogenic_help,D on_ambiguous,572
+q_kind,pathogenic_help,R on_ambiguous,522
+q_kind,pathogenic_help,M1 on_ambiguous,446
+q_kind,pathogenic_help,Ea on_ambiguous,527
+q_kind,pathogenic_help,En on_ambiguous,474
+q_kind,pathogenic_help,M1 on_absent,140
+q_kind,pathogenic_help,D on_absent,65
+q_kind,pathogenic_help,R on_absent,21
+mono_B,pathogenic_help,Ea rows / no ON wall in range / both walls,1018 / 465 (45.7%) / 408
+mono_B,pathogenic_help,En rows / no ON wall in range / both walls,1019 / 463 (45.4%) / 414
+mono_B,pathogenic_help,M1 rows / no ON wall in range / both walls,1267 / 595 (47.0%) / 294
+mono_B,pathogenic_help,R rows / no ON wall in range / both walls,1208 / 531 (44.0%) / 378
+mono_B,pathogenic_help,D rows / no ON wall in range / both walls,1126 / 442 (39.3%) / 358
+stats,pathogenic_help,En,n 2714; rho 0.893; p 0; OLS log10(gap) = -1.684 + 0.890 log10(G); G median 19.4% (IQR 12.7-38.1)
+stats,pathogenic_help,Ea,n 2688; rho 0.893; p 0; OLS log10(gap) = -1.683 + 0.891 log10(G); G median 19.3% (IQR 12.5-38.0)
+stats,pathogenic_help,PLP,n 2660; rho 0.892; p 0; OLS log10(gap) = -1.634 + 0.849 log10(G); G median 19.4% (IQR 12.7-38.6)
+stats,pathogenic_help,M1,n 2367; rho 0.773; p 0; OLS log10(gap) = -1.459 + 0.722 log10(G); G median 19.6% (IQR 12.8-34.8)
+stats,pathogenic_help,D,n 2630; rho 0.702; p 0; OLS log10(gap) = -1.266 + 0.584 log10(G); G median 21.5% (IQR 13.6-42.2)
+stats,pathogenic_help,R,n 2656; rho 0.550; p 4.19e-210; OLS log10(gap) = -0.941 + 0.448 log10(G); G median 12.3% (IQR 6.6-21.6)
+stats,pathogenic_help,distinct combinations plotted (any coordinate),2722
+stats,pathogenic_help,rows pooled over coordinates / drawn,15715 / 9000
+disagree,pathogenic_help,combinations in the disagreement file,5007
+disagree,pathogenic_help,plotted rows from those combinations,4161
+disagree,pathogenic_help,rho without them En,n 1979; rho 0.886
+disagree,pathogenic_help,rho without them Ea,n 1960; rho 0.886
+disagree,pathogenic_help,rho without them PLP,n 1935; rho 0.885
+disagree,pathogenic_help,rho without them M1,n 1800; rho 0.777
+disagree,pathogenic_help,rho without them D,n 1931; rho 0.761
+disagree,pathogenic_help,rho without them R,n 1949; rho 0.548
+disagree,pathogenic_help,coordinates on which the span differs by > 1%,PLP 5007
+disagree,pathogenic_help,PLP: median |span difference| in those rows,5.83e-11

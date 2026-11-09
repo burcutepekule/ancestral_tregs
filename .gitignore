@@ -1,0 +1,29 @@
+# the .rds cache built from the CSV files by setup_data.R, and anything a
+# pipeline stage writes: binary, regenerable, not under git
+data/*.rds
+
+# logs of make_figures.sh and of pipeline stages
+logs/
+logs_*/
+
+# R and editor clutter
+Rplots.pdf
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+.DS_Store
+__pycache__/
+
+# LaTeX by-products of docs/
+docs/*.aux
+docs/*.log
+docs/*.out
+docs/*.toc
+docs/*.fls
+docs/*.fdb_latexmk
+docs/*.synctex.gz
+
+# the separately rendered halves of stacked figures; the hand-drawn timeline is an input and is kept
+figures/parts/*
+!figures/parts/Fig_5_row2_timeline.png

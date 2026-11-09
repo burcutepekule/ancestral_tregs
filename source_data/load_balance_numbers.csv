@@ -1,0 +1,212 @@
+block,group,item,value
+gate,sterile,rescue rows,89328
+gate,sterile,rescue rows bistable,78169
+gate,sterile,rescue rows mono_B,11159
+gate,sterile,joined to skeleton,89328
+gate,sterile,bistable start,78169
+gate,sterile,bistable after worst-probe deviation <= 1e-2 on both rays,78057
+gate,sterile,bistable after both directions increasing,78051
+gate,sterile,bistable after gap not censored,78051
+gate,sterile,bistable after rescue_gap >= 5,606
+gate,sterile,bistable in the Treg-help class,541
+gate,sterile,bistable drawn,500
+gate,sterile,mono_B start,11159
+gate,sterile,mono_B after worst-probe deviation <= 1e-2 on both rays,11124
+gate,sterile,mono_B after OFF direction increasing,11124
+gate,sterile,mono_B after finite Eh0_off,11124
+gate,sterile,mono_B in the Treg-help class,9869
+gate,sterile,mono_B drawn,500
+gate,pathogenic_help,rescue rows,17495
+gate,pathogenic_help,rescue rows bistable,16225
+gate,pathogenic_help,rescue rows mono_B,1270
+gate,pathogenic_help,joined to skeleton,17495
+gate,pathogenic_help,bistable start,16225
+gate,pathogenic_help,bistable after worst-probe deviation <= 1e-2 on both rays,16197
+gate,pathogenic_help,bistable after both directions increasing,13701
+gate,pathogenic_help,bistable after gap not censored,13701
+gate,pathogenic_help,bistable after rescue_gap >= 2,180
+gate,pathogenic_help,bistable in the Treg-help class,180
+gate,pathogenic_help,bistable drawn,180
+gate,pathogenic_help,mono_B start,1270
+gate,pathogenic_help,mono_B after worst-probe deviation <= 1e-2 on both rays,854
+gate,pathogenic_help,mono_B after OFF direction increasing,854
+gate,pathogenic_help,mono_B after finite Eh0_off,854
+gate,pathogenic_help,mono_B in the Treg-help class,854
+gate,pathogenic_help,mono_B drawn,500
+gate,sterile,bistable integrated / summarised after the Treg-help filter,500 / 442
+gate,sterile,mono_B integrated / summarised after the Treg-help filter,500 / 453
+table,sterile bistable,n,442
+table,sterile bistable,reached_TMAX_both,442
+table,sterile bistable,starts_L_gt_Kg,442
+table,sterile bistable,L0_over_Kg_median,3.12
+table,sterile bistable,L0_over_Kg_range,1.93-5.97
+table,sterile bistable,OFF_min_L_above_Kg,441
+table,sterile bistable,OFF_min_L_over_Kg_median,2.07
+table,sterile bistable,OFF_median_load_removed_before_min_pct,33.2
+table,sterile bistable,OFF_time_of_min_median,20.5
+table,sterile bistable,OFF_kill_gt_clear_while_L_gt_Kg,442
+table,sterile bistable,OFF_ends_L_gt_Kg,442
+table,sterile bistable,OFF_end_L_over_Kg_median,10.13
+table,sterile bistable,OFF_end_L_over_Kg_IQR,7.65-12.87
+table,sterile bistable,OFF_at_rest,442
+table,sterile bistable,OFF_resolves_g095_ever,0
+table,sterile bistable,ON_L_at_OFF_min_over_Kg_median,2.00
+table,sterile bistable,OFF_L_at_OFF_min_over_Kg_median,2.07
+table,sterile bistable,ON_M1_at_OFF_min_median,13.6
+table,sterile bistable,OFF_M1_at_OFF_min_median,19.1
+table,sterile bistable,ON_lower_M1_at_OFF_min,442
+table,sterile bistable,ON_lower_peak_M1_while_L_gt_Kg,442
+table,sterile bistable,peak_M1_while_L_gt_Kg_median_OFF,68.7
+table,sterile bistable,peak_M1_while_L_gt_Kg_median_ON,14.3
+table,sterile bistable,ON_kill_gt_clear_while_L_gt_Kg,101
+table,sterile bistable,ON_L_reaches_Kg,442
+table,sterile bistable,ON_deeper_min_dLdt,442
+table,sterile bistable,ratio_min_dLdt_ON_over_OFF_median,2.37
+table,sterile bistable,ON_resolves_g095_ever,442
+table,sterile bistable,ON_ends_with_g095,442
+table,sterile bistable,ON_ends_L_lt_Kg,442
+table,sterile bistable,ON_end_L_over_Kg_median,0.080
+table,sterile bistable,ON_at_rest,442
+table,sterile bistable,ON_t95_median,54.5
+table,sterile ON_mono,n,453
+table,sterile ON_mono,reached_TMAX_both,453
+table,sterile ON_mono,starts_L_gt_Kg,453
+table,sterile ON_mono,L0_over_Kg_median,3.45
+table,sterile ON_mono,L0_over_Kg_range,1.98-5.69
+table,sterile ON_mono,OFF_min_L_above_Kg,453
+table,sterile ON_mono,OFF_min_L_over_Kg_median,2.50
+table,sterile ON_mono,OFF_median_load_removed_before_min_pct,26.0
+table,sterile ON_mono,OFF_time_of_min_median,16.0
+table,sterile ON_mono,OFF_kill_gt_clear_while_L_gt_Kg,453
+table,sterile ON_mono,OFF_ends_L_gt_Kg,453
+table,sterile ON_mono,OFF_end_L_over_Kg_median,9.48
+table,sterile ON_mono,OFF_end_L_over_Kg_IQR,7.13-12.20
+table,sterile ON_mono,OFF_at_rest,453
+table,sterile ON_mono,OFF_resolves_g095_ever,0
+table,sterile ON_mono,ON_L_at_OFF_min_over_Kg_median,2.48
+table,sterile ON_mono,OFF_L_at_OFF_min_over_Kg_median,2.50
+table,sterile ON_mono,ON_M1_at_OFF_min_median,12.9
+table,sterile ON_mono,OFF_M1_at_OFF_min_median,15.4
+table,sterile ON_mono,ON_lower_M1_at_OFF_min,453
+table,sterile ON_mono,ON_lower_peak_M1_while_L_gt_Kg,453
+table,sterile ON_mono,peak_M1_while_L_gt_Kg_median_OFF,42.3
+table,sterile ON_mono,peak_M1_while_L_gt_Kg_median_ON,15.1
+table,sterile ON_mono,ON_kill_gt_clear_while_L_gt_Kg,310
+table,sterile ON_mono,ON_L_reaches_Kg,453
+table,sterile ON_mono,ON_deeper_min_dLdt,453
+table,sterile ON_mono,ratio_min_dLdt_ON_over_OFF_median,2.59
+table,sterile ON_mono,ON_resolves_g095_ever,453
+table,sterile ON_mono,ON_ends_with_g095,453
+table,sterile ON_mono,ON_ends_L_lt_Kg,453
+table,sterile ON_mono,ON_end_L_over_Kg_median,0.028
+table,sterile ON_mono,ON_at_rest,453
+table,sterile ON_mono,ON_t95_median,130.5
+drawing,sterile,trajectories with stored points at L/Kg <= 1e-3 (not drawn),49
+gate,pathogenic_help,bistable integrated / summarised after the Treg-help filter,180 / 180
+gate,pathogenic_help,mono_B integrated / summarised after the Treg-help filter,500 / 500
+table,pathogenic_help bistable,n,180
+table,pathogenic_help bistable,reached_TMAX_both,180
+table,pathogenic_help bistable,starts_L_gt_Kg,180
+table,pathogenic_help bistable,L0_over_Kg_median,2.27
+table,pathogenic_help bistable,L0_over_Kg_range,1.11-3.20
+table,pathogenic_help bistable,OFF_min_L_above_Kg,169
+table,pathogenic_help bistable,OFF_min_L_over_Kg_median,1.82
+table,pathogenic_help bistable,OFF_median_load_removed_before_min_pct,19.5
+table,pathogenic_help bistable,OFF_time_of_min_median,11.8
+table,pathogenic_help bistable,OFF_kill_gt_clear_while_L_gt_Kg,180
+table,pathogenic_help bistable,OFF_ends_L_gt_Kg,180
+table,pathogenic_help bistable,OFF_end_L_over_Kg_median,6.80
+table,pathogenic_help bistable,OFF_end_L_over_Kg_IQR,6.03-7.81
+table,pathogenic_help bistable,OFF_at_rest,180
+table,pathogenic_help bistable,OFF_resolves_g095_ever,1
+table,pathogenic_help bistable,ON_L_at_OFF_min_over_Kg_median,1.79
+table,pathogenic_help bistable,OFF_L_at_OFF_min_over_Kg_median,1.82
+table,pathogenic_help bistable,ON_M1_at_OFF_min_median,25.6
+table,pathogenic_help bistable,OFF_M1_at_OFF_min_median,31.0
+table,pathogenic_help bistable,ON_lower_M1_at_OFF_min,180
+table,pathogenic_help bistable,ON_lower_peak_M1_while_L_gt_Kg,180
+table,pathogenic_help bistable,peak_M1_while_L_gt_Kg_median_OFF,80.9
+table,pathogenic_help bistable,peak_M1_while_L_gt_Kg_median_ON,33.0
+table,pathogenic_help bistable,ON_kill_gt_clear_while_L_gt_Kg,91
+table,pathogenic_help bistable,ON_L_reaches_Kg,180
+table,pathogenic_help bistable,ON_deeper_min_dLdt,180
+table,pathogenic_help bistable,ratio_min_dLdt_ON_over_OFF_median,2.41
+table,pathogenic_help bistable,ON_resolves_g095_ever,177
+table,pathogenic_help bistable,ON_ends_with_g095,177
+table,pathogenic_help bistable,ON_ends_L_lt_Kg,180
+table,pathogenic_help bistable,ON_end_L_over_Kg_median,0.153
+table,pathogenic_help bistable,ON_at_rest,180
+table,pathogenic_help bistable,ON_t95_median,53.0
+table,pathogenic_help bistable,OFF_PLP_end_lt_1e4_pct,71.7
+table,pathogenic_help bistable,OFF_PLP_end_lt_1e2_pct,85.0
+table,pathogenic_help bistable,ON_PLP_end_gt_1e2_pct,66.1
+table,pathogenic_help bistable,ON_PLP_end_gt_1e1_pct,5.0
+table,pathogenic_help bistable,OFF_PLP_end_median,0
+table,pathogenic_help bistable,ON_PLP_end_median,0.028
+table,pathogenic_help bistable,OFF_PLP_peak_median,0.261
+table,pathogenic_help bistable,ON_PLP_peak_median,0.261
+table,pathogenic_help ON_mono,n,500
+table,pathogenic_help ON_mono,reached_TMAX_both,500
+table,pathogenic_help ON_mono,starts_L_gt_Kg,500
+table,pathogenic_help ON_mono,L0_over_Kg_median,2.46
+table,pathogenic_help ON_mono,L0_over_Kg_range,1.76-4.27
+table,pathogenic_help ON_mono,OFF_min_L_above_Kg,498
+table,pathogenic_help ON_mono,OFF_min_L_over_Kg_median,2.05
+table,pathogenic_help ON_mono,OFF_median_load_removed_before_min_pct,14.5
+table,pathogenic_help ON_mono,OFF_time_of_min_median,9.0
+table,pathogenic_help ON_mono,OFF_kill_gt_clear_while_L_gt_Kg,499
+table,pathogenic_help ON_mono,OFF_ends_L_gt_Kg,498
+table,pathogenic_help ON_mono,OFF_end_L_over_Kg_median,7.79
+table,pathogenic_help ON_mono,OFF_end_L_over_Kg_IQR,6.40-10.34
+table,pathogenic_help ON_mono,OFF_at_rest,500
+table,pathogenic_help ON_mono,OFF_resolves_g095_ever,2
+table,pathogenic_help ON_mono,ON_L_at_OFF_min_over_Kg_median,2.03
+table,pathogenic_help ON_mono,OFF_L_at_OFF_min_over_Kg_median,2.05
+table,pathogenic_help ON_mono,ON_M1_at_OFF_min_median,8.1
+table,pathogenic_help ON_mono,OFF_M1_at_OFF_min_median,8.7
+table,pathogenic_help ON_mono,ON_lower_M1_at_OFF_min,499
+table,pathogenic_help ON_mono,ON_lower_peak_M1_while_L_gt_Kg,500
+table,pathogenic_help ON_mono,peak_M1_while_L_gt_Kg_median_OFF,67.9
+table,pathogenic_help ON_mono,peak_M1_while_L_gt_Kg_median_ON,27.8
+table,pathogenic_help ON_mono,ON_kill_gt_clear_while_L_gt_Kg,433
+table,pathogenic_help ON_mono,ON_L_reaches_Kg,497
+table,pathogenic_help ON_mono,ON_deeper_min_dLdt,499
+table,pathogenic_help ON_mono,ratio_min_dLdt_ON_over_OFF_median,2.68
+table,pathogenic_help ON_mono,ON_resolves_g095_ever,497
+table,pathogenic_help ON_mono,ON_ends_with_g095,497
+table,pathogenic_help ON_mono,ON_ends_L_lt_Kg,497
+table,pathogenic_help ON_mono,ON_end_L_over_Kg_median,0.118
+table,pathogenic_help ON_mono,ON_at_rest,500
+table,pathogenic_help ON_mono,ON_t95_median,244.0
+table,pathogenic_help ON_mono,OFF_PLP_end_lt_1e4_pct,78.0
+table,pathogenic_help ON_mono,OFF_PLP_end_lt_1e2_pct,95.2
+table,pathogenic_help ON_mono,ON_PLP_end_gt_1e2_pct,59.8
+table,pathogenic_help ON_mono,ON_PLP_end_gt_1e1_pct,28.6
+table,pathogenic_help ON_mono,OFF_PLP_end_median,0
+table,pathogenic_help ON_mono,ON_PLP_end_median,0.0394
+table,pathogenic_help ON_mono,OFF_PLP_peak_median,0.375
+table,pathogenic_help ON_mono,ON_PLP_peak_median,0.399
+exceptions,pathogenic_help,cid 71 bistable Tregs ON,L_end/Kg 0.620; min L/Kg 0.511; g_end/a0 0.877; resolves FALSE; at rest TRUE
+exceptions,pathogenic_help,cid 115 bistable Tregs ON,L_end/Kg 0.504; min L/Kg 0.502; g_end/a0 0.942; resolves FALSE; at rest TRUE
+exceptions,pathogenic_help,cid 127 bistable Tregs ON,L_end/Kg 0.551; min L/Kg 0.533; g_end/a0 0.919; resolves FALSE; at rest TRUE
+exceptions,pathogenic_help,cid 134 bistable Tregs OFF,L_end/Kg 16.284; min L/Kg 0.456; g_end/a0 0.044; resolves TRUE; at rest TRUE
+exceptions,pathogenic_help,cid 266 mono_B Tregs ON,L_end/Kg 7.730; min L/Kg 3.153; g_end/a0 0.045; resolves FALSE; at rest TRUE
+exceptions,pathogenic_help,cid 347 mono_B Tregs OFF,L_end/Kg 0.243; min L/Kg 0.219; g_end/a0 0.997; resolves TRUE; at rest TRUE
+exceptions,pathogenic_help,cid 351 mono_B Tregs ON,L_end/Kg 3.760; min L/Kg 2.324; g_end/a0 0.049; resolves FALSE; at rest TRUE
+exceptions,pathogenic_help,cid 538 mono_B Tregs OFF,L_end/Kg 0.176; min L/Kg 0.176; g_end/a0 0.999; resolves TRUE; at rest TRUE
+exceptions,pathogenic_help,cid 623 mono_B Tregs ON,L_end/Kg 4.866; min L/Kg 3.009; g_end/a0 0.046; resolves FALSE; at rest TRUE
+drawing,pathogenic_help,trajectories with stored points at L/Kg <= 1e-3 (not drawn),2
+on_mono_field,sterile,ON_mono with >= 2 stable Tregs-ON fixed points found (n_field_stable_on >= 2),763 of 11159
+gap_floor,sterile,"bistable with measured gap, both directions increasing",78163
+gap_floor,sterile,gap exactly 0 (pct),53.1
+gap_floor,sterile,gap < 0 (n),0
+gap_floor,sterile,gap <= one lattice step 0.078125 (pct),73.3
+gap_floor,sterile,gap max,48.594
+gap_floor,sterile,gap lattice check: max distance of gap/step from an integer,0.1
+on_mono_field,pathogenic_help,ON_mono with >= 2 stable Tregs-ON fixed points found (n_field_stable_on >= 2),581 of 1270
+gap_floor,pathogenic_help,"bistable with measured gap, both directions increasing",13725
+gap_floor,pathogenic_help,gap exactly 0 (pct),58.7
+gap_floor,pathogenic_help,gap < 0 (n),3
+gap_floor,pathogenic_help,gap <= one lattice step 0.078125 (pct),78.1
+gap_floor,pathogenic_help,gap max,33.281
+gap_floor,pathogenic_help,gap lattice check: max distance of gap/step from an integer,0
