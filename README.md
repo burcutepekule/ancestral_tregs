@@ -322,6 +322,6 @@ If you use this code or these data, please cite the paper:
 
 Archived version of this repository: [DOI].
 
-License: [to be stated by the authors before release].
+License: MIT (see `LICENSE`); it covers the code, the data tables and the figures.
 
 Questions: Burcu Tepekule, burcu.tepekule@unibas.ch
