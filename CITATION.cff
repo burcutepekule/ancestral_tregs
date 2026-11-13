@@ -6,7 +6,7 @@ version: 1.0.0
 date-released: 2026-11-13
 license: MIT
 repository-code: "https://github.com/burcutepekule/ancestral_tregs"
-doi: "[DOI]"
+doi: "10.5281/zenodo.24202660"
 authors:
   - family-names: Tepekule
     given-names: Burcu

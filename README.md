@@ -159,7 +159,7 @@ and the output of every expensive experiment. `data/README.md` describes each ta
 
 **What is not in git: the raw sweep.** The sweep evaluated 2,642,031 parameter
 combinations; its assembled output is 2.1 GB and does not belong in a git repository.
-It is deposited at [DOI]. Three stages need it: `03_select.R`, `census_core.R` and
+It is deposited separately at [DOI of the raw-sweep deposit, to follow]. Three stages need it: `03_select.R`, `census_core.R` and
 `45_beta_effero_tradeoff.R`. Their outputs are shipped, so nothing in section 1 needs it.
 `data/README.md` lists the few other files that are left out, and why.
 
@@ -180,7 +180,7 @@ run them from the repository root. Each script's header lists its inputs, output
 switches.
 
 **From the shipped data?** *yes*: the stage runs after `setup_data.R` with nothing else.
-*raw sweep*: it needs the 2.1 GB sweep output from [DOI].
+*raw sweep*: it needs the 2.1 GB sweep output from the separate raw-sweep deposit.
 
 ### The core: sampling, sweep, selection
 
@@ -320,7 +320,8 @@ If you use this code or these data, please cite the paper:
 > regulation may have evolved before adaptive immunity in jawed vertebrates: a modeling
 > study.* [journal, year, DOI]
 
-Archived version of this repository: [DOI].
+Archived version of this repository (v1.0.0): https://doi.org/10.5281/zenodo.24202660
+(all versions: https://doi.org/10.5281/zenodo.24202659).
 
 License: MIT (see `LICENSE`); it covers the code, the data tables and the figures.
 
