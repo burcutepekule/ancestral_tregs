@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+message: "If you use this code or data, please cite the paper and this repository."
+title: "Code and data for: Cell-mediated immune regulation may have evolved before adaptive immunity in jawed vertebrates: a modeling study"
+type: software
+version: 1.0.0
+date-released: 2026-11-13
+license: MIT
+repository-code: "https://github.com/burcutepekule/ancestral_tregs"
+doi: "[DOI]"
+authors:
+  - family-names: Tepekule
+    given-names: Burcu
+    affiliation: "Department of Biomedical Engineering, University of Basel, Basel, Switzerland"
+    email: burcu.tepekule@unibas.ch
+  - family-names: Mathieu
+    given-names: Lucas
+    affiliation: "Department of Biomedical Engineering, University of Basel, Basel, Switzerland"
+  - family-names: Müller
+    given-names: Viktor
+    affiliation: "Institute of Biology, ELTE Eötvös Loránd University, Budapest, Hungary; Institute of Evolution, HUN-REN Centre for Ecological Research, Budapest, Hungary"
+  - family-names: Kouyos
+    given-names: Roger D.
+    affiliation: "Department of Infectious Diseases and Hospital Epidemiology, University Hospital Zurich, Zurich, Switzerland; Institute of Medical Virology, University of Zurich, Zurich, Switzerland"
+  - family-names: Metcalf
+    given-names: C. Jessica E.
+    affiliation: "Department of Ecology and Evolutionary Biology, Princeton University, Princeton, USA"
+preferred-citation:
+  type: article
+  title: "Cell-mediated immune regulation may have evolved before adaptive immunity in jawed vertebrates: a modeling study"
+  authors:
+    - family-names: Tepekule
+      given-names: Burcu
+    - family-names: Mathieu
+      given-names: Lucas
+    - family-names: Müller
+      given-names: Viktor
+    - family-names: Kouyos
+      given-names: Roger D.
+    - family-names: Metcalf
+      given-names: C. Jessica E.
+  journal: "[journal]"
+  year: 2026
+  doi: "[paper DOI]"

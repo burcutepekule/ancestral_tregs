@@ -1,0 +1,15 @@
+{
+  "title": "Code and data for: Cell-mediated immune regulation may have evolved before adaptive immunity in jawed vertebrates: a modeling study",
+  "upload_type": "software",
+  "license": "MIT",
+  "access_right": "open",
+  "description": "The ODE model, the parameter sweep and selection pipeline, the gated set of simulations, and one script per figure of the paper. See README.md for how to reproduce every figure from the shipped data.",
+  "keywords": ["regulatory T cells", "immune regulation", "evolution of immunity", "ordinary differential equations", "mathematical model", "R"],
+  "creators": [
+    {"name": "Tepekule, Burcu", "affiliation": "University of Basel"},
+    {"name": "Mathieu, Lucas", "affiliation": "University of Basel"},
+    {"name": "Müller, Viktor", "affiliation": "ELTE Eötvös Loránd University; HUN-REN Centre for Ecological Research"},
+    {"name": "Kouyos, Roger D.", "affiliation": "University Hospital Zurich; University of Zurich"},
+    {"name": "Metcalf, C. Jessica E.", "affiliation": "Princeton University"}
+  ]
+}
