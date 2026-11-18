@@ -142,7 +142,7 @@ print(F4[, .(n = .N, cost_med = round(median(cost_noTreg), 2)), by = treg_effect
 
 ## ---- 8. the demonstration unit ---------------------------------------------------------
 sec(8, "the demonstration unit (figure_scripts/Fig_4.R D; lib/fig_demo_case.R)")
-DEMO = as.integer(Sys.getenv("UNIT", "4108"))
+DEMO = as.integer(Sys.getenv("UNIT", "38614"))
 u = MA[i == DEMO]; f = as.data.table(readRDS("./data/aux_gated_fourth_arm.rds"))[i == DEMO]
 cat(sprintf("unit %d: tau %d, K_g %g, r_P %.2f, E_h(0) %g, beta_r %.4g, beta* %.4g (%.2fx), t_peak %.3g, t_conv %s, Treg effect at own beta_r: %s\n",
             u$i, u$tau_id, u$Kg, u$r_L_P, u$Eh0, u$b_off, u$b_star, u$b_star / u$b_off, u$t_peak1_off, format(round(u$win), big.mark = ","), u$treg_effect))

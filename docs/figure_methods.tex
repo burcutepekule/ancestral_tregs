@@ -1178,18 +1178,20 @@ is 0.982 at $\tau = 0.5$, 0.836 at $\tau = 1$, reaches its minimum 0.430 at $\ta
 $\tau = 1$ and 1.108, 1.364, 1.804 and 1.881 at $\tau = 5$, 10, 50 and 100.
 % from: pipeline/checks/fig06_methods_numbers.R, section 5
 
-\paragraph{Panel D (the demonstration unit).} One unit (index 4108 of the sample:
-\texttt{tau\_id} 10812, $K_g = 35$, $r_P = 0.08$, $E_h(0) = 50$, $\beta_r = 0.0065$,
-$\beta_r^{*} = 0.0999$, i.e.\ $15.4\,\beta_r$; harm-labeled at its own $\beta_r$), kept as a demonstration case: its
-Tregs-ON line runs decreasing, so criterion~(4) excludes it from the 8{,}789 pairs, and it is
-shown for the largest cost of the aggression without the brake. Its four arms
+\paragraph{Panel D (the demonstration unit).} One unit (index 38614 of the sample:
+\texttt{tau\_id} 31555, $K_g = 45$, $r_P = 0.08$, $E_h(0) = 20$, $\beta_r = 0.0075$,
+$\beta_r^{*} = 0.0279$, i.e.\ $3.72\,\beta_r$; harm-labeled at its own $\beta_r$), one of the 15 pairs
+of the 8{,}789 in which only ON($\beta_r^{*}$) eliminates, chosen for lying at the medians of that
+set ($\beta_r^{*}/\beta_r$ 3.72 against a median of 3.56; cost of the aggression without the brake
+1.60 against a median of 1.62). Its four arms
 are re-integrated on a 3{,}000-point log-spaced grid and $M_1$, $P_{LP}$ and $E_h$ are drawn
-against time; the first peak of OFF($\beta_r$) at $t = 32.2$ and $t_{\mathrm{match}} = 1{,}244$ are marked. Final
-values: $P_{LP}$ 22.0 (OFF, $\beta_r$), 86.4 (ON, $\beta_r$), 0 (ON and OFF at $\beta_r^{*}$,
-eliminated at $t = 590$ and 327); $E_h$ 45.6, 56.8, 54.0 and 1.5; $M_1$ 20.4, 0.8, 1.1 and 85.1.
-The cumulative damage of OFF($\beta_r^{*}$) over $[0, t_{\mathrm{match}}]$ is 1.81 times that of OFF($\beta_r$); on
-% from: pipeline/checks/fig06_methods_numbers.R, section 8
-the 3{,}000-point grid of the figure the elimination times are 581 and 323.
+against time; the first peak of OFF($\beta_r$) at $t = 15.8$ and $t_{\mathrm{match}} = 3{,}257$ are marked. Final
+values: $P_{LP}$ 22.9 (OFF, $\beta_r$), 65.7 (ON, $\beta_r$), 0 (ON and OFF at $\beta_r^{*}$,
+eliminated at $t = 162$ and 151 on the grid of the figure; 165 for ON($\beta_r^{*}$) on the
+experiment's 400-point grid); $E_h$ 39.6, 52.7, 46.6 and 3.4; $M_1$ 9.9, 2.0, 2.3 and 58.0.
+The cumulative damage of OFF($\beta_r^{*}$) over $[0, t_{\mathrm{match}}]$ is 1.60 times that of OFF($\beta_r$).
+% unit 38614 since 2026-11-18 (lib/fig_demo_case.R output); the previous unit, 4108, had an
+% inverted Tregs-ON threshold and so was outside the 15 pairs the text describes.
 
 No bootstrap, test or correlation is used in Fig.~4; all summaries are medians and quartiles
 over pairs. The pairs span a region of parameter space whose distribution is not known, so

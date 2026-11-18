@@ -18,7 +18,8 @@
 ##      range over the drawn span; median and IQR over pairs. NOTHING IN B IS A MAGNITUDE.
 ##   C  the same pairs: P_LP of Tregs ON at beta_r and at beta_r*, relative to Tregs OFF
 ##      at beta_r (median, IQR over pairs of the log ratio).
-##   D  the demonstration unit (UNIT; default 4108): M1, P_LP and E_h of the four arms
+##   D  the demonstration unit (UNIT; default 38614, one of the 15 pairs in which only
+##      Tregs-ON at beta_r* eliminates): M1, P_LP and E_h of the four arms
 ##      OFF(beta_r), ON(beta_r), ON(beta_r*), OFF(beta_r*).
 ## t_peak: the time of the first peak of the pathogen of Tregs OFF at beta_r -- the first
 ## time the load turns over -- read off each pair's own trajectory. It needs no threshold,
@@ -35,7 +36,7 @@ SRC = Sys.getenv("SRC", "."); setwd(SRC)
 source("./lib/fig_damage_matched.R")
 BASE_SZ  = as.numeric(Sys.getenv("BASE_SIZE", "42"))
 F_TRAJ   = Sys.getenv("F_TRAJ", "./data/fig04b_v3_trajectories.rds")
-UNIT     = as.integer(Sys.getenv("UNIT", "4108"))
+UNIT     = as.integer(Sys.getenv("UNIT", "38614"))
 OUT_FIG  = Sys.getenv("OUT_FIG", "./figures/main/Fig_4.png")
 G_N      = as.integer(Sys.getenv("G_N", "400"))
 
